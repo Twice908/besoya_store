@@ -19,6 +19,8 @@ pool.connect()
 
 module.exports = pool;
 
+
+
 // ------ Add all users
 app.post('/api/products', async (req, res) => {
   const { seller_id, product_name, product_image, category, in_stock, variations } = req.body;
@@ -238,9 +240,6 @@ app.get('/api/orders/seller/:seller_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-
 // ── DELETE user ─────────────────────────────────────────────
 app.delete('/api/users/:user_id', async (req, res) => {
   const { user_id } = req.params;
@@ -258,7 +257,6 @@ app.delete('/api/users/:user_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── DELETE seller ───────────────────────────────────────────
 app.delete('/api/sellers/:seller_id', async (req, res) => {
   const { seller_id } = req.params;
@@ -276,7 +274,6 @@ app.delete('/api/sellers/:seller_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── DELETE product ──────────────────────────────────────────
 app.delete('/api/products/:product_id', async (req, res) => {
   const { product_id } = req.params;
@@ -294,6 +291,8 @@ app.delete('/api/products/:product_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 
 app.listen(3000, () => {
   console.log('🚀 Server is running on port 3000');
