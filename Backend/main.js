@@ -239,6 +239,62 @@ app.get('/api/orders/seller/:seller_id', async (req, res) => {
   }
 });
 
+
+
+// ── DELETE user ─────────────────────────────────────────────
+app.delete('/api/users/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [user_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(200).json({ message: 'User deleted successfully', deletedUser: result.rows[0] });
+  } catch (err) {
+    if (err.code === '23503') { // Foreign key constraint violation
+      return res.status(400).json({ error: 'Cannot delete user with existing orders' });
+    }
+    console.error('❌ Error deleting user:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ── DELETE seller ───────────────────────────────────────────
+app.delete('/api/sellers/:seller_id', async (req, res) => {
+  const { seller_id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM sellers WHERE seller_id = $1 RETURNING *', [seller_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Seller not found' });
+    }
+    res.status(200).json({ message: 'Seller deleted successfully', deletedSeller: result.rows[0] });
+  } catch (err) {
+    if (err.code === '23503') { // Foreign key constraint violation
+      return res.status(400).json({ error: 'Cannot delete seller with existing orders' });
+    }
+    console.error('❌ Error deleting seller:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ── DELETE product ──────────────────────────────────────────
+app.delete('/api/products/:product_id', async (req, res) => {
+  const { product_id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING *', [product_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.status(200).json({ message: 'Product deleted successfully', deletedProduct: result.rows[0] });
+  } catch (err) {
+    if (err.code === '23503') { // Foreign key constraint violation
+      return res.status(400).json({ error: 'Cannot delete product with existing orders' });
+    }
+    console.error('❌ Error deleting product:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(3000, () => {
   console.log('🚀 Server is running on port 3000');
 });
