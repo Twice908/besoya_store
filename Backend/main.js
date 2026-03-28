@@ -75,7 +75,6 @@ app.post('/api/orders', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── GET all users ──────────────────────────────────────────
 app.get('/api/users', async (req, res) => {
   try {
@@ -86,7 +85,6 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── GET all sellers ──────────────────────────────────────────
 app.get('/api/sellers', async (req, res) => {
   try {
@@ -97,7 +95,6 @@ app.get('/api/sellers', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── GET all products ──────────────────────────────────────────
 app.get('/api/products', async (req, res) => {
   try {
@@ -108,7 +105,6 @@ app.get('/api/products', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── GET all orders ──────────────────────────────────────────
 app.get('/api/orders', async (req, res) => {
   try {
@@ -119,7 +115,6 @@ app.get('/api/orders', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── UPDATE user details ──────────────────────────────────────
 app.put('/api/users/:user_id', async (req, res) => {
   const { user_id } = req.params;
@@ -151,7 +146,6 @@ app.put('/api/users/:user_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── UPDATE seller details ────────────────────────────────────
 app.put('/api/sellers/:seller_id', async (req, res) => {
   const { seller_id } = req.params;
@@ -175,7 +169,6 @@ app.put('/api/sellers/:seller_id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // ── UPDATE product details ───────────────────────────────────
 app.put('/api/products/:product_id', async (req, res) => {
   const { product_id } = req.params;
@@ -200,6 +193,48 @@ app.put('/api/products/:product_id', async (req, res) => {
     res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error('❌ Error updating product:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// ── GET products by seller_id ────────────────────────────────
+app.get('/api/products/seller/:seller_id', async (req, res) => {
+  const { seller_id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM products WHERE seller_id = $1 ORDER BY created_at DESC',
+      [seller_id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('❌ Error fetching products by seller:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// ── GET orders by user_id ────────────────────────────────────
+app.get('/api/orders/user/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM orders WHERE user_id = $1 ORDER BY order_id DESC',
+      [user_id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('❌ Error fetching orders by user:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// ── GET orders by seller_id ──────────────────────────────────
+app.get('/api/orders/seller/:seller_id', async (req, res) => {
+  const { seller_id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM orders WHERE seller_id = $1 ORDER BY order_id DESC',
+      [seller_id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('❌ Error fetching orders by seller:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
