@@ -27,7 +27,7 @@ export default function App() {
 
   const handleLogin = (userData: UserData) => {
     setLoggedUser(userData);
-    setView("home");
+    setView("dashboard");
   };
 
   const handleViewProduct = (product: Product) => {
