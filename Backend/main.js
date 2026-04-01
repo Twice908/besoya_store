@@ -1,9 +1,24 @@
 const { Pool } = require('pg');   // ← Pool, not Client
 const express = require('express');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json()); // for parsing application/json
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access token required' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+};
 
 const pool = new Pool({
   host:     'localhost',
@@ -21,8 +36,8 @@ module.exports = pool;
 
 
 
-// ------ Add all users
-app.post('/api/products', async (req, res) => {
+// ------ Add all products
+app.post('/api/products', authenticateToken, async (req, res) => {
   const { seller_id, product_name, product_image, category, in_stock, variations } = req.body;
   try {
     const result = await pool.query(
@@ -35,36 +50,85 @@ app.post('/api/products', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-// ------ Add all sellers
+// ------ Add all users
+// Signup API for users
 app.post('/api/users', async (req, res) => {
-  const { first_name, last_name, email, mobile, password_hash, address_line, area, landmark, city, postal_code, address_type, delivery_pref } = req.body;
+  const { first_name, last_name, email, mobile, password, address_line, area, landmark, city, postal_code, address_type, delivery_pref } = req.body;
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      'INSERT INTO users (first_name, last_name, email, mobile, password_hash, address_line, area, landmark, city, postal_code, address_type, delivery_pref) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *',
-      [first_name, last_name, email, mobile, password_hash, address_line, area, landmark, city, postal_code, address_type, delivery_pref]
+      'INSERT INTO users (first_name, last_name, email, mobile, password_hash, address_line, area, landmark, city, postal_code, address_type, delivery_pref) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING user_id, first_name, last_name, email, mobile, address_line, area, landmark, city, postal_code, address_type, delivery_pref, created_at',
+      [first_name, last_name, email, mobile, hashedPassword, address_line, area, landmark, city, postal_code, address_type, delivery_pref]
     );
-    res.status(201).json(result.rows[0]);
+    const user = result.rows[0];
+    const token = jwt.sign({ user_id: user.user_id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ token, user });
   } catch (err) {
     console.error('❌ Error inserting user:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-// ------ Add all products
+// ------ Add all sellers
+// Signup API for sellers
 app.post('/api/sellers', async (req, res) => {
-  const { seller_name, email, mobile, password_hash } = req.body;
+  const { seller_name, email, mobile, password } = req.body;
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      'INSERT INTO sellers (seller_name, email, mobile, password_hash) VALUES ($1, $2, $3, $4) RETURNING *',
-      [seller_name, email, mobile, password_hash]
+      'INSERT INTO sellers (seller_name, email, mobile, password_hash) VALUES ($1, $2, $3, $4) RETURNING seller_id, seller_name, email, mobile, created_at',
+      [seller_name, email, mobile, hashedPassword]
     );
-    res.status(201).json(result.rows[0]);
+    const seller = result.rows[0];
+    const token = jwt.sign({ seller_id: seller.seller_id, email: seller.email }, JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ token, seller });
   } catch (err) {
     console.error('❌ Error inserting seller:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+// ------ Auth APIs
+// ------ User Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const user = result.rows[0];
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ user_id: user.user_id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, user: { user_id: user.user_id, first_name: user.first_name, last_name: user.last_name, email: user.email } });
+  } catch (err) {
+    console.error('❌ Error logging in:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// ------ Seller Login
+app.post('/api/sellers/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM sellers WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const seller = result.rows[0];
+    const isValid = await bcrypt.compare(password, seller.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ seller_id: seller.seller_id, email: seller.email }, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, seller: { seller_id: seller.seller_id, seller_name: seller.seller_name, email: seller.email } });
+  } catch (err) {
+    console.error('❌ Error logging in seller:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 // ------ Add all orders
-app.post('/api/orders', async (req, res) => {
+app.post('/api/orders', authenticateToken, async (req, res) => {
   const { product_id, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status } = req.body;
   try {
     const result = await pool.query(
@@ -78,7 +142,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 // ── GET all users ──────────────────────────────────────────
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM users ORDER BY created_at DESC');
     res.status(200).json(result.rows);
@@ -88,7 +152,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 // ── GET all sellers ──────────────────────────────────────────
-app.get('/api/sellers', async (req, res) => {
+app.get('/api/sellers', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM sellers ORDER BY created_at DESC');
     res.status(200).json(result.rows);
@@ -98,7 +162,7 @@ app.get('/api/sellers', async (req, res) => {
   }
 });
 // ── GET all products ──────────────────────────────────────────
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
     res.status(200).json(result.rows);
@@ -108,7 +172,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 // ── GET all orders ──────────────────────────────────────────
-app.get('/api/orders', async (req, res) => {
+app.get('/api/orders', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM orders ORDER BY order_id DESC');
     res.status(200).json(result.rows);
@@ -118,7 +182,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 // ── UPDATE user details ──────────────────────────────────────
-app.put('/api/users/:user_id', async (req, res) => {
+app.put('/api/users/:user_id', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
   const { first_name, last_name, email, mobile, password_hash, address_line, area, landmark, city, postal_code, address_type, delivery_pref } = req.body;
   try {
@@ -149,7 +213,7 @@ app.put('/api/users/:user_id', async (req, res) => {
   }
 });
 // ── UPDATE seller details ────────────────────────────────────
-app.put('/api/sellers/:seller_id', async (req, res) => {
+app.put('/api/sellers/:seller_id', authenticateToken, async (req, res) => {
   const { seller_id } = req.params;
   const { seller_name, email, mobile, password_hash } = req.body;
   try {
@@ -172,7 +236,7 @@ app.put('/api/sellers/:seller_id', async (req, res) => {
   }
 });
 // ── UPDATE product details ───────────────────────────────────
-app.put('/api/products/:product_id', async (req, res) => {
+app.put('/api/products/:product_id', authenticateToken, async (req, res) => {
   const { product_id } = req.params;
   const { seller_id, product_name, product_image, category, in_stock, variations } = req.body;
   try {
@@ -199,7 +263,7 @@ app.put('/api/products/:product_id', async (req, res) => {
   }
 });
 // ── GET products by seller_id ────────────────────────────────
-app.get('/api/products/seller/:seller_id', async (req, res) => {
+app.get('/api/products/seller/:seller_id', authenticateToken, async (req, res) => {
   const { seller_id } = req.params;
   try {
     const result = await pool.query(
@@ -213,7 +277,7 @@ app.get('/api/products/seller/:seller_id', async (req, res) => {
   }
 });
 // ── GET orders by user_id ────────────────────────────────────
-app.get('/api/orders/user/:user_id', async (req, res) => {
+app.get('/api/orders/user/:user_id', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
   try {
     const result = await pool.query(
@@ -227,7 +291,7 @@ app.get('/api/orders/user/:user_id', async (req, res) => {
   }
 });
 // ── GET orders by seller_id ──────────────────────────────────
-app.get('/api/orders/seller/:seller_id', async (req, res) => {
+app.get('/api/orders/seller/:seller_id', authenticateToken, async (req, res) => {
   const { seller_id } = req.params;
   try {
     const result = await pool.query(
@@ -241,7 +305,7 @@ app.get('/api/orders/seller/:seller_id', async (req, res) => {
   }
 });
 // ── DELETE user ─────────────────────────────────────────────
-app.delete('/api/users/:user_id', async (req, res) => {
+app.delete('/api/users/:user_id', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
   try {
     const result = await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [user_id]);
@@ -258,7 +322,7 @@ app.delete('/api/users/:user_id', async (req, res) => {
   }
 });
 // ── DELETE seller ───────────────────────────────────────────
-app.delete('/api/sellers/:seller_id', async (req, res) => {
+app.delete('/api/sellers/:seller_id', authenticateToken, async (req, res) => {
   const { seller_id } = req.params;
   try {
     const result = await pool.query('DELETE FROM sellers WHERE seller_id = $1 RETURNING *', [seller_id]);
@@ -275,7 +339,7 @@ app.delete('/api/sellers/:seller_id', async (req, res) => {
   }
 });
 // ── DELETE product ──────────────────────────────────────────
-app.delete('/api/products/:product_id', async (req, res) => {
+app.delete('/api/products/:product_id', authenticateToken, async (req, res) => {
   const { product_id } = req.params;
   try {
     const result = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING *', [product_id]);
