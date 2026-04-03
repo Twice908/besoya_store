@@ -1,0 +1,152 @@
+/* Mock Products Data */
+export const PRODUCTS = [
+  {
+    id: "PRD-001",
+    name: "Split AC",
+    category: "Electronics",
+    priceRange: [35000, 45000],
+    variations: [
+      { name: "1.0 Ton", price: 35000 },
+      { name: "1.5 Ton", price: 42000 },
+      { name: "2.0 Ton", price: 45000 },
+    ],
+    stock: 12,
+  },
+  {
+    id: "PRD-002",
+    name: "Running Shoes",
+    category: "Footwear",
+    priceRange: [2500, 5500],
+    variations: [
+      { name: "Size 6", price: 2500 },
+      { name: "Size 8", price: 3500 },
+      { name: "Size 10", price: 5500 },
+    ],
+    stock: 45,
+  },
+  {
+    id: "PRD-003",
+    name: "Laptop Stand",
+    category: "Accessories",
+    priceRange: [800, 1500],
+    variations: [
+      { name: "Single Arm", price: 800 },
+      { name: "Adjustable", price: 1200 },
+      { name: "Dual Arm", price: 1500 },
+    ],
+    stock: 3,
+  },
+  {
+    id: "PRD-004",
+    name: "Washing Machine",
+    category: "Appliances",
+    priceRange: [18000, 35000],
+    variations: [
+      { name: "5kg", price: 18000 },
+      { name: "7kg", price: 25000 },
+      { name: "8kg", price: 35000 },
+    ],
+    stock: 0,
+  },
+  {
+    id: "PRD-005",
+    name: "Dining Table",
+    category: "Furniture",
+    priceRange: [15000, 28000],
+    variations: [
+      { name: "4 Seater", price: 15000 },
+      { name: "6 Seater", price: 22000 },
+      { name: "8 Seater", price: 28000 },
+    ],
+    stock: 5,
+  },
+  {
+    id: "PRD-006",
+    name: "Bluetooth Speaker",
+    category: "Electronics",
+    priceRange: [1500, 8000],
+    variations: [
+      { name: "Mini", price: 1500 },
+      { name: "Standard", price: 4000 },
+      { name: "Pro", price: 8000 },
+    ],
+    stock: 28,
+  },
+];
+
+/* Mock Orders Data */
+export const ORDERS = [
+  {
+    id: "ORD-20240301-001",
+    product: "Split AC",
+    datetime: "Mar 01, 2024 • 9:15 AM",
+    buyer: "Rajesh Kumar",
+    address: "Bangalore, Karnataka",
+    payment: "Paid",
+    paymentMethod: "Credit Card",
+    status: "Delivered",
+  },
+  {
+    id: "ORD-20240302-002",
+    product: "Running Shoes",
+    datetime: "Mar 02, 2024 • 2:45 PM",
+    buyer: "Priya Singh",
+    address: "Delhi, India",
+    payment: "Pending",
+    paymentMethod: "UPI",
+    status: "Processing",
+  },
+  {
+    id: "ORD-20240303-003",
+    product: "Laptop Stand",
+    datetime: "Mar 03, 2024 • 11:30 AM",
+    buyer: "Amit Patel",
+    address: "Mumbai, Maharashtra",
+    payment: "Paid",
+    paymentMethod: "Debit Card",
+    status: "Shipped",
+  },
+  {
+    id: "ORD-20240304-004",
+    product: "Washing Machine",
+    datetime: "Mar 04, 2024 • 8:20 AM",
+    buyer: "Sanjay Verma",
+    address: "Pune, Maharashtra",
+    payment: "Pending",
+    paymentMethod: "Net Banking",
+    status: "Pending",
+  },
+  {
+    id: "ORD-20240305-005",
+    product: "Dining Table",
+    datetime: "Mar 05, 2024 • 4:10 PM",
+    buyer: "Nisha Gupta",
+    address: "Chennai, Tamil Nadu",
+    payment: "Paid",
+    paymentMethod: "Credit Card",
+    status: "Delivered",
+  },
+  {
+    id: "ORD-20240306-006",
+    product: "Bluetooth Speaker",
+    datetime: "Mar 06, 2024 • 10:05 AM",
+    buyer: "Vikram Singh",
+    address: "Hyderabad, Telangana",
+    payment: "Cancelled",
+    paymentMethod: "UPI",
+    status: "Cancelled",
+  },
+  {
+    id: "ORD-20240306-007",
+    product: "Running Shoes",
+    datetime: "Mar 06, 2024 • 3:50 PM",
+    buyer: "Simran Kapoor",
+    address: "Jaipur, Rajasthan",
+    payment: "Paid",
+    paymentMethod: "Debit Card",
+    status: "Return",
+  },
+];
+
+/* Order status array */
+export const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return"];
