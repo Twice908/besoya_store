@@ -1,4 +1,4 @@
-const { Pool } = require("pg"); // ← Pool, not Client
+const { Pool } = require("./db") ; // ← Pool, not Client
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -20,19 +20,17 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-const { Pool } = require("pg");
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
-
-pool
-  .connect()
-  .then(() => console.log("✅ Connected to Render PostgreSQL"))
-  .catch((err) => console.error("❌ DB connection error:", err.message));
+// pool
+//   .connect()
+//   .then(() => console.log("✅ Connected to Render PostgreSQL"))
+//   .catch((err) => console.error("❌ DB connection error:", err.message));
 
 // module.exports = pool;
 
