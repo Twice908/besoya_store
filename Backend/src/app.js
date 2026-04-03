@@ -1,4 +1,4 @@
-const { Pool } = require("./db") ; // ← Pool, not Client
+const pool = require("./db") ; // ← Pool, not Client
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -8,6 +8,8 @@ const app = express();
 app.use(express.json()); // for parsing application/json
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+const createTables = require("./config/migrate");
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -542,6 +544,16 @@ app.delete("/api/products/:product_id", authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server is running on port 3000");
-});
+(async () => {
+  try {
+    await createTables(); // 🔥 THIS CREATES TABLES
+
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+  }
+})();

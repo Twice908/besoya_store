@@ -1,4 +1,4 @@
-const pool = require('./index'); // your db file
+const pool = require('../db'); // your db file
 
 const createTables = async () => {
   try {
@@ -96,11 +96,13 @@ const createTables = async () => {
     `);
 
     console.log('🎉 All tables created successfully');
-    process.exit(0);
+    // process.exit(0);
   } catch (err) {
     console.error('❌ Migration error:', err.message);
-    process.exit(1);
+    // process.exit(1);
   }
 };
 
-createTables();
+// createTables();
+
+module.exports = createTables;
