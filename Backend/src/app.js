@@ -1,4 +1,4 @@
-const pool = require("./db") ; // ← Pool, not Client
+const pool = require("./db"); // ← Pool, not Client
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -43,17 +43,19 @@ app.post("/api/products", authenticateToken, async (req, res) => {
     product_name,
     product_image,
     category,
+    price,
     in_stock,
     variations,
   } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO products (seller_id, product_name, product_image, category, in_stock, variations) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      "INSERT INTO products (seller_id, product_name, product_image, category, price, in_stock, variations) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [
         seller_id,
         product_name,
         product_image,
         category,
+        price,
         in_stock,
         JSON.stringify(variations),
       ],
@@ -375,6 +377,7 @@ app.put("/api/products/:product_id", authenticateToken, async (req, res) => {
     product_name,
     product_image,
     category,
+    price,
     in_stock,
     variations,
   } = req.body;
@@ -386,15 +389,17 @@ app.put("/api/products/:product_id", authenticateToken, async (req, res) => {
         product_name = COALESCE($2, product_name),
         product_image = COALESCE($3, product_image),
         category = COALESCE($4, category),
-        in_stock = COALESCE($5, in_stock),
-        variations = COALESCE($6, variations),
+        price = COALESCE($5, price),
+        in_stock = COALESCE($6, in_stock),
+        variations = COALESCE($7, variations),
         updated_at = NOW()
-      WHERE product_id = $7 RETURNING *`,
+      WHERE product_id = $8 RETURNING *`,
       [
         seller_id,
         product_name,
         product_image,
         category,
+        price,
         in_stock,
         variationsJson,
         product_id,
@@ -470,12 +475,10 @@ app.delete("/api/users/:user_id", authenticateToken, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: "User deleted successfully",
-        deletedUser: result.rows[0],
-      });
+    res.status(200).json({
+      message: "User deleted successfully",
+      deletedUser: result.rows[0],
+    });
   } catch (err) {
     if (err.code === "23503") {
       // Foreign key constraint violation
@@ -498,12 +501,10 @@ app.delete("/api/sellers/:seller_id", authenticateToken, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Seller not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Seller deleted successfully",
-        deletedSeller: result.rows[0],
-      });
+    res.status(200).json({
+      message: "Seller deleted successfully",
+      deletedSeller: result.rows[0],
+    });
   } catch (err) {
     if (err.code === "23503") {
       // Foreign key constraint violation
@@ -526,12 +527,10 @@ app.delete("/api/products/:product_id", authenticateToken, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Product deleted successfully",
-        deletedProduct: result.rows[0],
-      });
+    res.status(200).json({
+      message: "Product deleted successfully",
+      deletedProduct: result.rows[0],
+    });
   } catch (err) {
     if (err.code === "23503") {
       // Foreign key constraint violation
