@@ -1,7 +1,7 @@
 interface ProductDetailNavbarProps {
   onBack: () => void;
   productName: string;
-  category: string;
+  category?: string;
 }
 
 const ProductDetailNavbar = ({ onBack, productName, category }: ProductDetailNavbarProps) => (
@@ -13,7 +13,7 @@ const ProductDetailNavbar = ({ onBack, productName, category }: ProductDetailNav
       <span style={{ color: "var(--muted)" }}>Home</span>
       <span className="pdp-nav__crumb-sep">/</span>
       <span style={{ color: "var(--muted)" }}>
-        {category.charAt(0).toUpperCase() + category.slice(1)}
+        {category ? category.charAt(0).toUpperCase() + category.slice(1) : 'General'}
       </span>
       <span className="pdp-nav__crumb-sep">/</span>
       <span>{productName.length > 32 ? productName.slice(0, 32) + "…" : productName}</span>

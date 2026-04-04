@@ -1,29 +1,50 @@
 import { useState } from "react";
-
-interface Product {
-  badge?: string | null;
-  badgeType?: string | null;
-  emoji: string;
-}
+import type { Product } from "../../services/productService";
 
 interface ProductGalleryProps {
   product: Product;
 }
 
 const ProductGallery = ({ product }: ProductGalleryProps) => {
-  const thumbEmojis = [product.emoji, product.emoji, product.emoji, product.emoji];
+  // Provide fallback emoji based on category or use a default
+  const getEmoji = () => {
+    if (product.category) {
+      const categoryEmojis: Record<string, string> = {
+        'electronics': '📱',
+        'clothing': '👕',
+        'books': '📚',
+        'home': '🏠',
+        'sports': '⚽',
+        'beauty': '💄',
+        'toys': '🧸',
+        'food': '🍎'
+      };
+      return categoryEmojis[product.category.toLowerCase()] || '📦';
+    }
+    return '📦'; // Default emoji
+  };
+
+  const emoji = getEmoji();
+  const thumbEmojis = [emoji, emoji, emoji, emoji];
   const [activeThumb, setActiveThumb] = useState(0);
   const [wished, setWished] = useState(false);
 
   return (
     <div className="pdp-gallery">
       <div className="pdp-main-img">
-        {product.badge && (
-          <div className={`pdp-img-badge pdp-img-badge--${product.badgeType}`}>
-            {product.badge}
-          </div>
-        )}
-        {thumbEmojis[activeThumb]}
+        {product.product_image ? (
+          <img
+            src={product.product_image}
+            alt={product.product_name}
+            className="pdp-main-img__content"
+            onError={(e) => {
+              // Fallback to emoji if image fails to load
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling!.textContent = emoji;
+            }}
+          />
+        ) : null}
+        <div className="pdp-main-img__fallback">{thumbEmojis[activeThumb]}</div>
         <button
           className={`pdp-wish-btn ${wished ? "pdp-wish-btn--active" : ""}`}
           onClick={() => setWished(w => !w)}
