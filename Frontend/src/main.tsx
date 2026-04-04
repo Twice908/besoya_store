@@ -15,7 +15,7 @@ const RootLayout = () => (
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename='/besoya_store'>
       <RootLayout />
     </BrowserRouter>
   </StrictMode>,
