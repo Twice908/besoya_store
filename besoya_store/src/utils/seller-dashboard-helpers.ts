@@ -2,11 +2,16 @@
 
 export const orderStatusTag = (status: string): { color: string; text: string } => {
   const map: Record<string, { color: string; text: string }> = {
+    Started: { color: "tag--amber", text: "Started" },
+    "In Transit": { color: "tag--blue", text: "In Transit" },
+    "Left Transit": { color: "tag--blue", text: "Left Transit" },
+    Delivered: { color: "tag--green", text: "Delivered" },
+    Returning: { color: "tag--amber", text: "Returning" },
+    Returned: { color: "tag--gray", text: "Returned" },
+    Cancelled: { color: "tag--red", text: "Cancelled" },
     Pending: { color: "tag--amber", text: "Pending" },
     Processing: { color: "tag--blue", text: "Processing" },
     Shipped: { color: "tag--blue", text: "Shipped" },
-    Delivered: { color: "tag--green", text: "Delivered" },
-    Cancelled: { color: "tag--red", text: "Cancelled" },
     Return: { color: "tag--red", text: "Return" },
   };
   return map[status] || { color: "tag--gray", text: status };
@@ -16,6 +21,7 @@ export const payStatusTag = (status: string): { color: string; text: string } =>
   const map: Record<string, { color: string; text: string }> = {
     Paid: { color: "tag--green", text: "Paid" },
     Pending: { color: "tag--amber", text: "Pending" },
+    Failed: { color: "tag--red", text: "Failed" },
     Cancelled: { color: "tag--red", text: "Cancelled" },
   };
   return map[status] || { color: "tag--gray", text: status };

@@ -8,7 +8,10 @@ import ProductDetailsPage from './pages/product_details_page';
 import OrdersPage from './pages/orders_page';
 import CheckoutPage from './pages/checkout_page';
 import DashboardPage from './pages/dashboard_page';
+import AddProductPage from './pages/add_product_page';
+import EditProductPage from './pages/edit_product_page';
 import UserProfilePage from './pages/user_profile_page';
+import SellerAuthPage from './pages/seller_auth_page';
 
 export const AppRoutes = () => {
   return (
@@ -41,6 +44,7 @@ export const AppRoutes = () => {
           </PublicRoute>
         }
       />
+      <Route path="/seller/login" element={<SellerAuthPage />} />
 
       {/* Protected routes - require authentication */}
       <Route
@@ -80,6 +84,22 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/add-product"
+        element={
+          <ProtectedRoute>
+            <AddProductPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/edit-product/:productId"
+        element={
+          <ProtectedRoute>
+            <EditProductPage />
           </ProtectedRoute>
         }
       />

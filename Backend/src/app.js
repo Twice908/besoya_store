@@ -75,10 +75,11 @@ app.post("/api/products", authenticateToken, async (req, res) => {
     price,
     in_stock,
     variations,
+    description,
   } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO products (seller_id, product_name, product_image, category, price, in_stock, variations) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      "INSERT INTO products (seller_id, product_name, product_image, category, price, in_stock, variations, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [
         seller_id,
         product_name,
@@ -86,7 +87,8 @@ app.post("/api/products", authenticateToken, async (req, res) => {
         category,
         price,
         in_stock,
-        JSON.stringify(variations),
+        JSON.stringify(variations ?? []),
+        description ?? null,
       ],
     );
     res.status(201).json(result.rows[0]);
@@ -95,8 +97,6 @@ app.post("/api/products", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 // ------ Add all users
 // Signup API for users
 app.post("/api/users", async (req, res) => {
@@ -145,8 +145,6 @@ app.post("/api/users", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 // ------ Add all sellers
 // Signup API for sellers
 app.post("/api/sellers", async (req, res) => {
@@ -169,8 +167,6 @@ app.post("/api/sellers", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 // ------ Auth APIs
 // ------ User Login
 app.post("/api/login", async (req, res) => {
@@ -318,6 +314,23 @@ app.get("/api/sellers", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// ── GET single seller ─────────────────────────────────────────
+app.get("/api/sellers/:seller_id", authenticateToken, async (req, res) => {
+  const { seller_id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT seller_id, seller_name, email, mobile, created_at FROM sellers WHERE seller_id = $1",
+      [seller_id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Seller not found" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error fetching seller:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 // ── GET all products ──────────────────────────────────────────
 app.get("/api/products", authenticateToken, async (req, res) => {
   try {
@@ -434,6 +447,7 @@ app.put("/api/products/:product_id", authenticateToken, async (req, res) => {
     price,
     in_stock,
     variations,
+    description,
   } = req.body;
   try {
     const variationsJson = variations ? JSON.stringify(variations) : undefined;
@@ -446,8 +460,9 @@ app.put("/api/products/:product_id", authenticateToken, async (req, res) => {
         price = COALESCE($5, price),
         in_stock = COALESCE($6, in_stock),
         variations = COALESCE($7, variations),
+        description = COALESCE($8, description),
         updated_at = NOW()
-      WHERE product_id = $8 RETURNING *`,
+      WHERE product_id = $9 RETURNING *`,
       [
         seller_id,
         product_name,
@@ -456,6 +471,7 @@ app.put("/api/products/:product_id", authenticateToken, async (req, res) => {
         price,
         in_stock,
         variationsJson,
+        description ?? null,
         product_id,
       ],
     );
@@ -486,6 +502,23 @@ app.get(
     }
   },
 );
+// ── GET single product (after /seller/:id so "seller" is not captured as id) ──
+app.get("/api/products/:product_id", authenticateToken, async (req, res) => {
+  const { product_id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM products WHERE product_id = $1",
+      [product_id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error fetching product:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 // ── GET orders by user_id ────────────────────────────────────
 app.get("/api/orders/user/:user_id", authenticateToken, async (req, res) => {
   const { user_id } = req.params;
@@ -570,6 +603,41 @@ app.delete("/api/sellers/:seller_id", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// ── DELETE all products for a seller ─────────────────────────
+app.delete(
+  "/api/products/seller/:seller_id",
+  authenticateToken,
+  async (req, res) => {
+    const { seller_id } = req.params;
+    try {
+      const sellerCheck = await pool.query(
+        "SELECT 1 FROM sellers WHERE seller_id = $1",
+        [seller_id],
+      );
+      if (sellerCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Seller not found" });
+      }
+      const result = await pool.query(
+        "DELETE FROM products WHERE seller_id = $1 RETURNING *",
+        [seller_id],
+      );
+      res.status(200).json({
+        message: `${result.rowCount} product(s) deleted successfully`,
+        deletedCount: result.rowCount,
+        deletedProducts: result.rows,
+      });
+    } catch (err) {
+      if (err.code === "23503") {
+        return res.status(400).json({
+          error:
+            "Cannot delete one or more products that are referenced by existing orders",
+        });
+      }
+      console.error("❌ Error deleting products by seller:", err.message);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
 // ── DELETE product ──────────────────────────────────────────
 app.delete("/api/products/:product_id", authenticateToken, async (req, res) => {
   const { product_id } = req.params;

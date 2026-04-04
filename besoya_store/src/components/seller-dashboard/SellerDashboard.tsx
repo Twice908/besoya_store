@@ -5,10 +5,16 @@ import { ProductsTable } from "./ProductsTable";
 import { OrdersTable } from "./OrdersTable";
 
 interface SellerDashboardProps {
+  sellerId: number | null;
   onLogout?: () => void;
+  onAddProduct?: () => void;
 }
 
-export const SellerDashboard = ({ onLogout }: SellerDashboardProps) => {
+export const SellerDashboard = ({
+  sellerId,
+  onLogout,
+  onAddProduct,
+}: SellerDashboardProps) => {
   const [active, setActive] = useState<"products" | "orders">("products");
 
   const sectionTitles = {
@@ -28,10 +34,15 @@ export const SellerDashboard = ({ onLogout }: SellerDashboardProps) => {
         <Topbar
           title={sectionTitles[active]}
           subtitle={sectionSubtitles[active]}
+          sellerId={sellerId}
           onSignOut={onLogout}
         />
         <div className="content">
-          {active === "products" ? <ProductsTable /> : <OrdersTable />}
+          {active === "products" ? (
+            <ProductsTable sellerId={sellerId} onAddProduct={onAddProduct} />
+          ) : (
+            <OrdersTable sellerId={sellerId} />
+          )}
         </div>
       </div>
     </div>

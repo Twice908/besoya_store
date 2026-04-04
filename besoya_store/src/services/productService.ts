@@ -1,4 +1,5 @@
 import { AuthService } from './authService';
+import { SellerService } from './sellerService';
 
 const API_BASE_URL = 'https://besoya-store-api.onrender.com';
 
@@ -38,14 +39,25 @@ export interface UpdateProductData {
   variations?: any[];
 }
 
+export interface DeleteProductsBySellerResponse {
+  message: string;
+  deletedCount: number;
+  deletedProducts: Product[];
+}
+
 export class ProductService {
+  private static requestAuthHeaders(): Record<string, string> {
+    const seller = SellerService.getSellerAuthHeaders();
+    return Object.keys(seller).length > 0 ? seller : AuthService.getAuthHeaders();
+  }
+
   static async createProduct(data: CreateProductData): Promise<Product> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
         body: JSON.stringify(data),
       });
@@ -68,7 +80,7 @@ export class ProductService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
@@ -89,7 +101,7 @@ export class ProductService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
@@ -112,7 +124,7 @@ export class ProductService {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...AuthService.getAuthHeaders(),
+            ...this.requestAuthHeaders(),
           },
         },
       );
@@ -139,7 +151,7 @@ export class ProductService {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            ...AuthService.getAuthHeaders(),
+            ...this.requestAuthHeaders(),
           },
           body: JSON.stringify(data),
         },
@@ -165,7 +177,7 @@ export class ProductService {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            ...AuthService.getAuthHeaders(),
+            ...this.requestAuthHeaders(),
           },
         },
       );
@@ -176,6 +188,35 @@ export class ProductService {
       }
     } catch (error) {
       console.error('Delete product error:', error);
+      throw error;
+    }
+  }
+
+  static async deleteProductsBySellerID(
+    sellerID: number,
+  ): Promise<DeleteProductsBySellerResponse> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/products/seller/${sellerID}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...this.requestAuthHeaders(),
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || 'Failed to delete seller products',
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Delete seller products error:', error);
       throw error;
     }
   }
