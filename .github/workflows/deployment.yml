@@ -1,4 +1,4 @@
-name: Deploy Website
+name: Deploy Frontend Website
 
 on:
   push:
@@ -14,18 +14,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: besoya_store   # IMPORTANT
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - run: npm install
-      - run: npm run build
+      - name: Install Dependencies
+        run: npm install
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Build Website
+        run: npm run build
+
+      - name: Upload Build Files
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./build
+          path: besoya_store/build   # or dist (see below)
 
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
