@@ -2,6 +2,8 @@ const pool = require("./db"); // ← Pool, not Client
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
+
 require("dotenv").config();
 
 const app = express();
@@ -21,6 +23,29 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+app.options("*", cors());
+
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
+
+// pool
+//   .connect()
+//   .then(() => console.log("✅ Connected to Render PostgreSQL"))
+//   .catch((err) => console.error("❌ DB connection error:", err.message));
+
+// module.exports = pool;
 
 // ------ Add all products
 app.post("/api/products", authenticateToken, async (req, res) => {
