@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Brand from "../components/brand.tsx";
 import PasswordField from "../components/password_field.tsx";
+import { AuthService } from "../services/authService";
+import type { SignupData } from "../services/authService";
 
 interface SignUpPageProps {
   onGoLogin: () => void;
@@ -42,6 +44,8 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const set = (key: keyof SignUpForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [key]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
@@ -58,15 +62,38 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
-    setSubmitted(true);
-    // TESTING: Temporarily marking as submitted for display
-    // In production, this would send data to backend
-    console.log("Testing signup with form data:", form);
+    setApiError(null);
+    setLoading(true);
+
+    try {
+      const signupData: SignupData = {
+        first_name: form.firstName,
+        last_name: form.lastName,
+        email: form.email,
+        mobile: form.mobile,
+        password: form.password,
+        address_line: form.addressLine || undefined,
+        area: form.area || undefined,
+        landmark: form.landmark || undefined,
+        city: form.city || undefined,
+        postal_code: form.postalCode || undefined,
+        address_type: form.addressType,
+        delivery_pref: form.deliveryTime,
+      };
+
+      const response = await AuthService.signup(signupData);
+      AuthService.saveToken(response.token);
+      setSubmitted(true);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -107,6 +134,13 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {apiError && (
+            <div className="full">
+              <div className="error-message" style={{ color: 'red', marginBottom: 16 }}>
+                {apiError}
+              </div>
+            </div>
+          )}
           <div className="form-grid">
 
             {/* ── Personal Info ── */}
@@ -261,8 +295,8 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
 
             {/* ── Submit ── */}
             <div className="full">
-              <button type="submit" className="btn btn--primary" style={{ marginTop: 6 }}>
-                Create My Account 🚀
+              <button type="submit" className="btn btn--primary" style={{ marginTop: 6 }} disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create My Account 🚀'}
               </button>
             </div>
 
