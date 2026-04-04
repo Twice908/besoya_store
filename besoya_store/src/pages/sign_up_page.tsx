@@ -1,12 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Brand from "../components/brand.tsx";
 import PasswordField from "../components/password_field.tsx";
 import { AuthService } from "../services/authService";
 import type { SignupData } from "../services/authService";
-
-interface SignUpPageProps {
-  onGoLogin: () => void;
-}
 
 interface SignUpForm {
   firstName: string;
@@ -32,7 +29,8 @@ interface FormErrors {
 /* ============================================================
    PAGE: SignUpPage
    ============================================================ */
-const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
+const SignUpPage = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState<SignUpForm>({
     firstName: "", lastName: "", email: "", mobile: "",
     password: "", confirmPassword: "",
@@ -86,9 +84,10 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
         delivery_pref: form.deliveryTime,
       };
 
-      const response = await AuthService.signup(signupData);
-      AuthService.saveToken(response.token);
+      await AuthService.signup(signupData);
       setSubmitted(true);
+      // Navigate to login after showing success for a moment
+      setTimeout(() => navigate("/login", { replace: true }), 2000);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
@@ -112,7 +111,7 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
           <button
             className="btn btn--primary"
             style={{ marginTop: 28 }}
-            onClick={onGoLogin}
+            onClick={() => navigate("/login")}
           >
             Go to Sign In
           </button>
@@ -305,7 +304,7 @@ const SignUpPage = ({ onGoLogin }: SignUpPageProps) => {
 
         <div className="form-foot">
           Already have an account?{" "}
-          <button className="link-btn" onClick={onGoLogin}>Sign in</button>
+          <button className="link-btn" onClick={() => navigate("/login")}>Sign in</button>
         </div>
       </div>
     </div>

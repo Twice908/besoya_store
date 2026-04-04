@@ -1,16 +1,21 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { SellerDashboard } from "../components/seller-dashboard";
-
-interface DashboardPageProps {
-  user?: { email: string } | null;
-  onLogout?: () => void;
-}
 
 /**
  * DashboardPage - Main dashboard for sellers after login
  * Displays products and orders management interface
  */
-const DashboardPage = ({ onLogout }: DashboardPageProps) => {
-  return <SellerDashboard onLogout={onLogout} />;
+const DashboardPage = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
+  return <SellerDashboard onLogout={handleLogout} />;
 };
 
 export default DashboardPage;

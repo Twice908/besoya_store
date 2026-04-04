@@ -1,16 +1,15 @@
 export type Product = {
-  id: number;
-  name: string;
-  category: string;
-  emoji: string;
-  badge?: string | null;
-  badgeType?: string | null;
+  product_id: number;
+  seller_id: number;
+  product_name: string;
+  description?: string;
+  product_image?: string;
+  category?: string;
   price: number;
-  originalPrice?: number;
-  discount?: number;
-  rating: number;
-  reviews: number;
-  inStock: number;
+  in_stock: number;
+  variations?: any[];
+  created_at: string;
+  updated_at: string;
 };
 
 export const CATEGORIES = [

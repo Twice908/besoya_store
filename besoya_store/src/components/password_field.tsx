@@ -8,12 +8,13 @@ interface PasswordFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 /* ============================================================
    COMPONENT: PasswordField  — input + show/hide toggle
    ============================================================ */
-const PasswordField = ({ id, label, value, onChange, placeholder = "••••••••", className = "" }: PasswordFieldProps) => {
+const PasswordField = ({ id, label, value, onChange, placeholder = "••••••••", className = "", disabled = false }: PasswordFieldProps) => {
   const [show, setShow] = useState(false);
   return (
     <div className={`field ${className}`}>
@@ -27,12 +28,14 @@ const PasswordField = ({ id, label, value, onChange, placeholder = "••••
           value={value}
           onChange={onChange}
           autoComplete="off"
+          disabled={disabled}
         />
         <button
           type="button"
           className="field__icon-btn"
           onClick={() => setShow(s => !s)}
           aria-label={show ? "Hide password" : "Show password"}
+          disabled={disabled}
         >
           <EyeIcon open={show} />
         </button>
