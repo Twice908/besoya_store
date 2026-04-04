@@ -88,6 +88,7 @@ const createTables = async () => {
         seller_id INT NOT NULL
           REFERENCES sellers(seller_id) ON DELETE CASCADE,
         product_name VARCHAR(150) NOT NULL,
+        description TEXT,
         product_image TEXT,
         category VARCHAR(80),
         price NUMERIC(10,2) DEFAULT 0,
@@ -101,6 +102,7 @@ const createTables = async () => {
       'product_id SERIAL PRIMARY KEY',
       'seller_id INT NOT NULL REFERENCES sellers(seller_id) ON DELETE CASCADE',
       'product_name VARCHAR(150) NOT NULL',
+      'description TEXT',
       'product_image TEXT',
       'category VARCHAR(80)',
       'price NUMERIC(10,2) DEFAULT 0',
