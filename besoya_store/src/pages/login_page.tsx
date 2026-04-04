@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Brand from "../components/brand.tsx";
 import PasswordField from "../components/password_field.tsx";
+import { AuthService } from "../services/authService.ts";
+// import type { SignupData } from "../services/authService";
 
 interface LoginPageProps {
   onLogin: (userData: { email: string }) => void;
@@ -14,13 +16,23 @@ interface LoginPageProps {
 const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TESTING: Temporarily logging in with just email (no real auth)
-    // In production, this would validate against a backend
-    console.log("Testing login with email:", email);
-    onLogin({ email });
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await AuthService.login({ email, password });
+      AuthService.saveToken(response.token);
+      onLogin(response.user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
