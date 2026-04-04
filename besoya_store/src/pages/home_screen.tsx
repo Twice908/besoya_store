@@ -52,7 +52,7 @@ const HomeScreen = () => {
     .filter(p => {
       if (activeFilters.includes("Under ₹1,000") && p.price >= 1000) return false;
       if (activeFilters.includes("Under ₹5,000") && p.price >= 5000) return false;
-      if (activeFilters.includes("In Stock Only") && p.in_stock === 0) return false;
+      if (activeFilters.includes("In Stock Only") && p.inStock === 0) return false;
       return true;
     })
     .sort((a, b) => {

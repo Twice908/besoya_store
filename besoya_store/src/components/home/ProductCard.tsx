@@ -12,8 +12,8 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onAddToCart, onView }: ProductCardProps) => {
   const [wished, setWished] = useState(false);
-  const { text: stockText, cls: stockCls } = stockLabel(product.in_stock);
-  const outOfStock = product.in_stock === 0;
+  const { text: stockText, cls: stockCls } = stockLabel(product.inStock);
+  const outOfStock = product.inStock === 0;
 
   return (
     <div className="p-card">
