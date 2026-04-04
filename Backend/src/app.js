@@ -22,20 +22,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
-// });
-
-// pool
-//   .connect()
-//   .then(() => console.log("✅ Connected to Render PostgreSQL"))
-//   .catch((err) => console.error("❌ DB connection error:", err.message));
-
-// module.exports = pool;
-
 // ------ Add all products
 app.post("/api/products", authenticateToken, async (req, res) => {
   const {

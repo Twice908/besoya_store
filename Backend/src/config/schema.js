@@ -52,6 +52,7 @@ const createTables = async () => {
       seller_id       INT          NOT NULL
                       REFERENCES sellers(seller_id) ON DELETE CASCADE,
       product_name    VARCHAR(150) NOT NULL,
+      description     TEXT,                        -- Product description
       product_image   TEXT,                        -- URL or file path
       category        VARCHAR(80),
       price           NUMERIC(10,2) DEFAULT 0,
