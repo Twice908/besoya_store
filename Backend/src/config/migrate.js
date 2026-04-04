@@ -47,6 +47,7 @@ const createTables = async () => {
         product_name VARCHAR(150) NOT NULL,
         product_image TEXT,
         category VARCHAR(80),
+        price NUMERIC(10,2) DEFAULT 0,
         in_stock INT NOT NULL DEFAULT 0 CHECK (in_stock >= 0),
         variations JSONB DEFAULT '[]',
         created_at TIMESTAMP DEFAULT NOW(),
