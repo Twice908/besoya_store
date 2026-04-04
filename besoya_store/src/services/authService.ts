@@ -56,11 +56,18 @@ export class AuthService {
 
   static async login(data: LoginData): Promise<AuthResponse> {
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      const existingToken = this.getToken();
+      if (existingToken) {
+        headers.Authorization = `Bearer ${existingToken}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(data),
       });
 
@@ -74,6 +81,11 @@ export class AuthService {
       console.error('Login error:', error);
       throw error;
     }
+  }
+
+  static getAuthHeaders(): Record<string, string> {
+    const token = this.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
   static saveToken(token: string) {

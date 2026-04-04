@@ -75,6 +75,8 @@ app.post("/api/products", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 // ------ Add all users
 // Signup API for users
 app.post("/api/users", async (req, res) => {
@@ -123,6 +125,8 @@ app.post("/api/users", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 // ------ Add all sellers
 // Signup API for sellers
 app.post("/api/sellers", async (req, res) => {
@@ -145,10 +149,26 @@ app.post("/api/sellers", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 // ------ Auth APIs
 // ------ User Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
+  const authHeader = req.headers["authorization"];
+  const headerToken = authHeader && authHeader.split(" ")[1];
+
+  if (headerToken) {
+    try {
+      const payload = jwt.verify(headerToken, JWT_SECRET);
+      if (payload && payload.email && payload.email !== email) {
+        return res.status(401).json({ error: "Token email does not match login email" });
+      }
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid auth token" });
+    }
+  }
+
   try {
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
