@@ -36,6 +36,7 @@ app.use(cors({
       "http://localhost:5175",
       "http://localhost:5176",
       "http://localhost:5177",
+      "https://twice908.github.io/besoya_store/",
       "https://besoya-store.vercel.app",
       "https://besoya-store.netlify.app"
     ];
