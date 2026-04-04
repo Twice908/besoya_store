@@ -1,14 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Brand from "../components/brand.tsx";
-
-interface ForgotPasswordPageProps {
-  onGoLogin: () => void;
-}
 
 /* ============================================================
    PAGE: ForgotPasswordPage
    ============================================================ */
-const ForgotPasswordPage = ({ onGoLogin }: ForgotPasswordPageProps) => {
+const ForgotPasswordPage = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -68,7 +66,7 @@ const ForgotPasswordPage = ({ onGoLogin }: ForgotPasswordPageProps) => {
         <button
           className="btn btn--outline"
           style={{ marginTop: sent ? 0 : 14 }}
-          onClick={onGoLogin}
+          onClick={() => navigate("/login")}
         >
           ← Back to Login
         </button>

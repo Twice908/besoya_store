@@ -29,9 +29,19 @@ export interface AuthResponse {
     email: string;
     mobile: string;
   };
+  expires_in?: number; // Token expiration time in seconds
+}
+
+export interface TokenData {
+  token: string;
+  expiresAt: number; // Timestamp when token expires
+  user: AuthResponse['user'];
 }
 
 export class AuthService {
+  private static readonly TOKEN_KEY = 'authToken';
+  private static readonly TOKEN_EXPIRY_BUFFER = 5 * 60 * 1000; // 5 minutes buffer
+
   static async signup(data: SignupData): Promise<AuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/users`, {
@@ -47,7 +57,9 @@ export class AuthService {
         throw new Error(errorData.message || 'Signup failed');
       }
 
-      return await response.json();
+      const authData = await response.json();
+      this.saveAuthData(authData);
+      return authData;
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
@@ -56,18 +68,11 @@ export class AuthService {
 
   static async login(data: LoginData): Promise<AuthResponse> {
     try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      const existingToken = this.getToken();
-      if (existingToken) {
-        headers.Authorization = `Bearer ${existingToken}`;
-      }
-
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
       });
 
@@ -76,31 +81,104 @@ export class AuthService {
         throw new Error(errorData.message || 'Login failed');
       }
 
-      return await response.json();
+      const authData = await response.json();
+      this.saveAuthData(authData);
+      return authData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
     }
   }
 
+  // Save authentication data with expiration
+  static saveAuthData(authData: AuthResponse) {
+    const expiresIn = authData.expires_in || (4 * 60 * 60); // Default 4 hours
+    const expiresAt = Date.now() + (expiresIn * 1000);
+
+    const tokenData: TokenData = {
+      token: authData.token,
+      expiresAt,
+      user: authData.user
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, JSON.stringify(tokenData));
+  }
+
+  // Get valid token (checks expiration)
+  static getToken(): string | null {
+    const tokenDataStr = localStorage.getItem(this.TOKEN_KEY);
+    if (!tokenDataStr) return null;
+
+    try {
+      const tokenData: TokenData = JSON.parse(tokenDataStr);
+
+      // Check if token is expired (with buffer time)
+      if (Date.now() >= (tokenData.expiresAt - this.TOKEN_EXPIRY_BUFFER)) {
+        this.removeToken(); // Clean up expired token
+        return null;
+      }
+
+      return tokenData.token;
+    } catch (error) {
+      console.error('Error parsing token data:', error);
+      this.removeToken();
+      return null;
+    }
+  }
+
+  // Get current user data
+  static getCurrentUser(): AuthResponse['user'] | null {
+    const tokenDataStr = localStorage.getItem(this.TOKEN_KEY);
+    if (!tokenDataStr) return null;
+
+    try {
+      const tokenData: TokenData = JSON.parse(tokenDataStr);
+      return tokenData.user;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Check if user is authenticated (token exists and not expired)
+  static isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  // Check if token is close to expiring
+  static isTokenExpiringSoon(): boolean {
+    const tokenDataStr = localStorage.getItem(this.TOKEN_KEY);
+    if (!tokenDataStr) return false;
+
+    try {
+      const tokenData: TokenData = JSON.parse(tokenDataStr);
+      const timeUntilExpiry = tokenData.expiresAt - Date.now();
+      return timeUntilExpiry < (10 * 60 * 1000); // Less than 10 minutes
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Get auth headers for API calls
   static getAuthHeaders(): Record<string, string> {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  static saveToken(token: string) {
-    localStorage.setItem('authToken', token);
-  }
-
-  static getToken(): string | null {
-    return localStorage.getItem('authToken');
-  }
-
+  // Remove all authentication data
   static removeToken() {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 
-  static isAuthenticated(): boolean {
-    return !!this.getToken();
+  // Logout user
+  static logout() {
+    this.removeToken();
+  }
+
+  // Check if we need to refresh token (for future implementation)
+  static async refreshToken(): Promise<boolean> {
+    // This would be implemented if your API supports token refresh
+    // For now, we'll just return false to force re-login
+    console.log('Token refresh not implemented - user needs to login again');
+    return false;
   }
 }

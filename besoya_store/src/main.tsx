@@ -1,10 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.tsx'
-import App from './App.tsx'
+import { BrowserRouter } from 'react-router-dom'
+import GlobalStyles from './index.tsx'
+import { AuthProvider } from './contexts/AuthContext'
+import { AppRoutes } from './router'
+import './utils/apiInterceptors'
+
+const RootLayout = () => (
+  <AuthProvider>
+    <GlobalStyles />
+    <AppRoutes />
+  </AuthProvider>
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <RootLayout />
+    </BrowserRouter>
   </StrictMode>,
 )

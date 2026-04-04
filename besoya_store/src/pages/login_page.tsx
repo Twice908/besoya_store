@@ -1,23 +1,23 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Brand from "../components/brand.tsx";
 import PasswordField from "../components/password_field.tsx";
-import { AuthService } from "../services/authService.ts";
-// import type { SignupData } from "../services/authService";
-
-interface LoginPageProps {
-  onLogin: (userData: { email: string }) => void;
-  onGoSignUp: () => void;
-  onGoForgot: () => void;
-}
 
 /* ============================================================
    PAGE: LoginPage
    ============================================================ */
-const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Get the redirect path from location state (where user was trying to go)
+  const from = (location.state as any)?.from?.pathname || "/home";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,9 +25,9 @@ const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
     setLoading(true);
 
     try {
-      const response = await AuthService.login({ email, password });
-      AuthService.saveToken(response.token);
-      onLogin(response.user);
+      await login(email, password);
+      // Redirect to the page user was trying to access, or home
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -51,6 +51,19 @@ const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit}>
+          {error && (
+            <div style={{
+              color: 'var(--danger)',
+              background: 'rgba(204, 51, 51, 0.1)',
+              padding: '12px',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
           {/* Email Field */}
           <div className="field" style={{ marginBottom: 16 }}>
             <label className="field__label" htmlFor="login-email">Email Address</label>
@@ -62,6 +75,7 @@ const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -71,23 +85,24 @@ const LoginPage = ({ onLogin, onGoSignUp, onGoForgot }: LoginPageProps) => {
             label="Password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            disabled={loading}
           />
 
           {/* Forgot Password */}
           <div className="forgot-row" style={{ marginTop: 10, marginBottom: 22 }}>
-            <button type="button" className="link-btn" onClick={onGoForgot}>
+            <button type="button" className="link-btn" onClick={() => navigate("/forgot-password")} disabled={loading}>
               Forgot password?
             </button>
           </div>
 
-          <button type="submit" className="btn btn--primary">
-            Sign In →
+          <button type="submit" className="btn btn--primary" disabled={loading}>
+            {loading ? 'Signing In...' : 'Sign In →'}
           </button>
         </form>
 
         <div className="form-foot" style={{ marginTop: 24 }}>
           Don't have an account?{" "}
-          <button className="link-btn" onClick={onGoSignUp}>Create one</button>
+          <button className="link-btn" onClick={() => navigate("/signup")}>Create one</button>
         </div>
       </div>
     </div>

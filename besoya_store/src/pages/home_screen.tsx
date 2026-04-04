@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   HomeNavbar,
   CategoryBar,
@@ -8,24 +9,14 @@ import {
   CartSidebar,
   CartToast,
   CATEGORIES,
-  PRODUCTS,
   SORT_OPTIONS,
   FILTER_CHIPS,
 } from "../components/home";
 import type { Product } from "../components/home";
+import { ProductService } from "../services/productService";
 
-interface CartItem {
-  product: Product;
-  quantity: number;
-  price: number;
-}
-
-interface HomeScreenPageProps {
-  onViewProduct: (product: Product) => void;
-  onAddToCart: (item: CartItem) => void;
-}
-
-const HomeScreen = ({ onViewProduct, onAddToCart }: HomeScreenPageProps) => {
+const HomeScreen = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState("popular");
@@ -33,28 +24,53 @@ const HomeScreen = ({ onViewProduct, onAddToCart }: HomeScreenPageProps) => {
   const [toast, setToast] = useState({ visible: false, name: "" });
   const [cartOpen, setCartOpen] = useState(false);
   const [localCartItems, setLocalCartItems] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const visible = PRODUCTS
+  // Fetch products on component mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const fetchedProducts = await ProductService.getAllProducts();
+        setProducts(fetchedProducts);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const visible = products
     .filter(p => activeCategory === "all" || p.category === activeCategory)
     .filter(p => {
       if (activeFilters.includes("Under ₹1,000") && p.price >= 1000) return false;
       if (activeFilters.includes("Under ₹5,000") && p.price >= 5000) return false;
-      if (activeFilters.includes("4★ & Above") && p.rating < 4) return false;
-      if (activeFilters.includes("In Stock Only") && p.inStock === 0) return false;
+      if (activeFilters.includes("In Stock Only") && p.in_stock === 0) return false;
       return true;
     })
     .sort((a, b) => {
       if (sort === "price_asc") return a.price - b.price;
       if (sort === "price_desc") return b.price - a.price;
-      if (sort === "rating") return b.rating - a.rating;
+      // For "popular", we'll sort by newest first (created_at)
+      if (sort === "popular") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       return 0;
     });
 
-  const handleAddToCart = (product: typeof PRODUCTS[number]) => {
+  const handleAddToCart = (product: Product) => {
     setLocalCartItems(c => [...c, product]);
-    onAddToCart({ product, quantity: 1, price: product.price });
-    setToast({ visible: true, name: product.name });
+    setToast({ visible: true, name: product.product_name });
     setTimeout(() => setToast(t => ({ ...t, visible: false })), 2800);
+  };
+
+  const handleViewProduct = (product: Product) => {
+    navigate(`/product/${product.product_id}`, { state: { product } });
   };
 
   const handleCartClick = () => {
@@ -63,16 +79,16 @@ const HomeScreen = ({ onViewProduct, onAddToCart }: HomeScreenPageProps) => {
 
   const handleUpdateQty = (productId: number, delta: -1 | 1) => {
     if (delta === -1) {
-      const idx = localCartItems.findIndex(p => p.id === productId);
+      const idx = localCartItems.findIndex(p => p.product_id === productId);
       if (idx !== -1) setLocalCartItems(c => [...c.slice(0, idx), ...c.slice(idx + 1)]);
     } else {
-      const product = PRODUCTS.find(p => p.id === productId);
+      const product = products.find(p => p.product_id === productId);
       if (product) setLocalCartItems(c => [...c, product]);
     }
   };
 
   const handleRemove = (productId: number) => {
-    setLocalCartItems(c => c.filter(p => p.id !== productId));
+    setLocalCartItems(c => c.filter(p => p.product_id !== productId));
   };
 
   const handleClear = () => {
@@ -119,7 +135,23 @@ const HomeScreen = ({ onViewProduct, onAddToCart }: HomeScreenPageProps) => {
           </select>
         </div>
 
-        {visible.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted)" }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
+            <div style={{ fontSize: 15 }}>Loading products...</div>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: "center", padding: "60px 0", color: "var(--danger)" }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>❌</div>
+            <div style={{ fontSize: 15, marginBottom: 12 }}>{error}</div>
+            <button
+              style={{ background: "var(--accent)", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </button>
+          </div>
+        ) : visible.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: "var(--muted)" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
             <div style={{ fontSize: 15 }}>No products match your filters.</div>
@@ -133,7 +165,7 @@ const HomeScreen = ({ onViewProduct, onAddToCart }: HomeScreenPageProps) => {
         ) : (
           <div className="product-grid">
             {visible.map(p => (
-              <ProductCard key={p.id} product={p} onAddToCart={handleAddToCart} onView={onViewProduct} />
+              <ProductCard key={p.product_id} product={p} onAddToCart={handleAddToCart} onView={handleViewProduct} />
             ))}
           </div>
         )}
