@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: besoya_store   # IMPORTANT
+        working-directory: Frontend
 
     steps:
       - name: Checkout Code
