@@ -1,16 +1,32 @@
 import { useState } from "react";
 import { EXTENDED_PRODUCT_DATA } from "./ProductDetailData";
 import { fmtPrice, StarsRow, getStockState } from "./ProductDetailHelpers";
-import type { Product } from "../home";
+import type { Product as APIProduct } from "../../services/productService";
+
+type ProductInfoProduct = APIProduct & Partial<{
+  id: number;
+  name: string;
+  inStock: number;
+  originalPrice: number;
+  discount: number;
+  rating: number;
+  reviews: number;
+}>;
 
 interface ProductInfoProps {
-  product: Product;
-  onAddToCart: (product: Product, qty: number, price: number) => void;
+  product: ProductInfoProduct;
+  onAddToCart: (product: ProductInfoProduct, qty: number, price: number) => void;
 }
 
 const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
-  const ext = EXTENDED_PRODUCT_DATA[product.id] || EXTENDED_PRODUCT_DATA.default;
-  const outOfStock = product.inStock === 0;
+  const productId = product.product_id ?? product.id ?? 0;
+  const productName = product.product_name ?? product.name ?? "Product";
+  const inStock = product.in_stock ?? product.inStock ?? 0;
+  const productRating = product.rating ?? 0;
+  const reviewCount = product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
+
+  const ext = EXTENDED_PRODUCT_DATA[productId] || EXTENDED_PRODUCT_DATA.default;
+  const outOfStock = inStock === 0;
 
   const [qty, setQty] = useState(1);
   const [activeVar, setActiveVar] = useState(
@@ -21,7 +37,7 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
     ? ext.variations[activeVar]?.price ?? product.price
     : product.price;
 
-  const { cls: stockCls, text: stockText } = getStockState(product.inStock);
+  const { cls: stockCls, text: stockText } = getStockState(inStock);
 
   const handleAddToCart = () => {
     onAddToCart(product, qty, currentPrice);
@@ -34,12 +50,12 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         {ext.seller}
       </div>
 
-      <h1 className="pdp-title">{product.name}</h1>
+      <h1 className="pdp-title">{productName}</h1>
 
       <div className="pdp-rating">
-        <StarsRow rating={product.rating} />
-        <span className="pdp-rating__score">{product.rating}</span>
-        <span className="pdp-rating__count">({product.reviews.toLocaleString()} reviews)</span>
+        <StarsRow rating={productRating} />
+        <span className="pdp-rating__score">{productRating}</span>
+        <span className="pdp-rating__count">({reviewCount.toLocaleString()} reviews)</span>
         <span className="pdp-rating__divider">|</span>
         <span className="pdp-rating__sold">{ext.soldCount} sold</span>
       </div>
@@ -112,11 +128,11 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
             <div className="pdp-qty-val">{qty}</div>
             <button
               className="pdp-qty-btn"
-              onClick={() => setQty(q => Math.min(product.inStock, q + 1))}
-              disabled={qty >= product.inStock}
+              onClick={() => setQty(q => Math.min(inStock, q + 1))}
+              disabled={qty >= inStock}
             >+</button>
           </div>
-          <span className="pdp-qty-label">Max {product.inStock} units per order</span>
+          <span className="pdp-qty-label">Max {inStock} units per order</span>
         </div>
       )}
 

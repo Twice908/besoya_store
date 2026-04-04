@@ -103,7 +103,12 @@ const HomeScreen = () => {
 
   return (
     <>
-      <HomeNavbar cartCount={localCartItems.length} wishCount={wishItems.length} onCartClick={handleCartClick} />
+      <HomeNavbar
+        cartCount={localCartItems.length}
+        wishCount={wishItems.length}
+        onCartClick={handleCartClick}
+        onOrdersClick={() => navigate('/orders')}
+      />
       <CategoryBar active={activeCategory} setActive={setActiveCategory} />
       <div className="home-shell">
         {activeCategory === "all" && <HeroBanner />}

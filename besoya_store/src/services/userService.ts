@@ -55,6 +55,27 @@ export class UserService {
     }
   }
 
+  static async getUser(userId: number): Promise<User> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthService.getAuthHeaders(),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Fetch user error:', error);
+      throw error;
+    }
+  }
+
   static async updateUser(userID: number, data: UpdateUserData): Promise<User> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/users/${userID}`, {
