@@ -3,22 +3,20 @@ import { EXTENDED_PRODUCT_DATA } from "./ProductDetailData";
 import { StarsRow } from "./ProductDetailHelpers";
 import type { Product as APIProduct } from "../../services/productService";
 
-type ProductTabsProduct = APIProduct & Partial<{
-  id: number;
-  name: string;
-  inStock: number;
-  originalPrice: number;
-  discount: number;
-  rating: number;
-  reviews: number;
-}>;
+type ProductTabsProduct = APIProduct &
+  Partial<{
+    originalPrice: number;
+    discount: number;
+    rating: number;
+    reviews: number;
+  }>;
 
 interface ProductTabsProps {
   product: ProductTabsProduct;
 }
 
 const ProductTabs = ({ product }: ProductTabsProps) => {
-  const productId = product.product_id ?? product.id ?? 0;
+  const productId = product.product_id;
   const productRating = product.rating ?? 0;
   const reviewCount = product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
   const ext = EXTENDED_PRODUCT_DATA[productId] || EXTENDED_PRODUCT_DATA.default;

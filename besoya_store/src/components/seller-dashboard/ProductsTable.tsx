@@ -325,7 +325,7 @@ export const ProductsTable = ({ sellerId, onAddProduct }: ProductsTableProps) =>
                 <th>Price</th>
                 <th>Description</th>
                 <th>Variations</th>
-                <th>Stock (in_stock)</th>
+                <th>Stock</th>
                 <th>Updated</th>
                 <th>Actions</th>
               </tr>
@@ -333,7 +333,7 @@ export const ProductsTable = ({ sellerId, onAddProduct }: ProductsTableProps) =>
             <tbody>
               {filteredProducts.map((prod) => {
                 const vars = parseVariations(prod.variations);
-                const { color, dotClass } = stockStatus(prod.in_stock);
+                const { color, dotClass } = stockStatus(prod.inStock);
                 return (
                   <tr key={prod.product_id}>
                     <td>
@@ -396,8 +396,8 @@ export const ProductsTable = ({ sellerId, onAddProduct }: ProductsTableProps) =>
                       <div className="stock-cell">
                         <div className={`stock-dot ${dotClass}`} />
                         <span className={color}>
-                          {prod.in_stock}{" "}
-                          {prod.in_stock === 0 ? "Out" : "units"}
+                          {prod.inStock}{" "}
+                          {prod.inStock === 0 ? "Out" : "units"}
                         </span>
                       </div>
                     </td>

@@ -3,15 +3,13 @@ import { EXTENDED_PRODUCT_DATA } from "./ProductDetailData";
 import { fmtPrice, StarsRow, getStockState } from "./ProductDetailHelpers";
 import type { Product as APIProduct } from "../../services/productService";
 
-type ProductInfoProduct = APIProduct & Partial<{
-  id: number;
-  name: string;
-  inStock: number;
-  originalPrice: number;
-  discount: number;
-  rating: number;
-  reviews: number;
-}>;
+type ProductInfoProduct = APIProduct &
+  Partial<{
+    originalPrice: number;
+    discount: number;
+    rating: number;
+    reviews: number;
+  }>;
 
 interface ProductInfoProps {
   product: ProductInfoProduct;
@@ -19,9 +17,9 @@ interface ProductInfoProps {
 }
 
 const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
-  const productId = product.product_id ?? product.id ?? 0;
-  const productName = product.product_name ?? product.name ?? "Product";
-  const inStock = product.in_stock ?? product.inStock ?? 0;
+  const productId = product.product_id;
+  const productName = product.product_name;
+  const inStock = product.inStock;
   const productRating = product.rating ?? 0;
   const reviewCount = product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
 

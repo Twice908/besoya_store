@@ -19,7 +19,7 @@ const CheckoutPage = () => {
 
   // Helper to get product ID
   const getProductId = (product: any): number => {
-    return product.product_id || product.id || 0;
+    return product.product_id ?? 0;
   };
 
   // Helper to get seller ID
@@ -39,7 +39,7 @@ const CheckoutPage = () => {
 
   // Helper to get product name
   const getProductName = (product: any): string => {
-    return product.name || product.product_name || "Product";
+    return product.product_name || product.name || "Product";
   };
 
   // Redirect if no cart items

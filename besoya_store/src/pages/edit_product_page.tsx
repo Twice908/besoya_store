@@ -46,7 +46,7 @@ function applyProductToForm(p: Product, setters: {
   setters.setProductImageUrl(p.product_image ?? "");
   setters.setCategory(p.category ?? "");
   setters.setPrice(String(p.price ?? ""));
-  setters.setInStock(String(p.in_stock ?? ""));
+  setters.setInStock(String(p.inStock ?? ""));
   setters.setDescription(p.description ?? "");
   setters.setVariationsJson(variationsToFormText(p.variations));
 }
@@ -204,7 +204,7 @@ const EditProductPage = () => {
       seller_id: sellerId,
       product_name: productName.trim(),
       price: priceNum,
-      in_stock: stockNum,
+      inStock: stockNum,
       ...(productImageUrl.trim()
         ? { product_image: productImageUrl.trim() }
         : { product_image: "" }),
@@ -390,7 +390,7 @@ const EditProductPage = () => {
             <label htmlFor="ep-stock">In stock</label>
             <input
               id="ep-stock"
-              name="in_stock"
+              name="inStock"
               type="number"
               required
               min={0}

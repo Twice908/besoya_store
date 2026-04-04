@@ -114,7 +114,7 @@ const AddProductPage = () => {
         seller_id: sellerId,
         product_name: productName.trim(),
         price: priceNum,
-        in_stock: stockNum,
+        inStock: stockNum,
         ...(productImageUrl.trim()
           ? { product_image: productImageUrl.trim() }
           : {}),
@@ -241,7 +241,7 @@ const AddProductPage = () => {
             <label htmlFor="ap-stock">In stock</label>
             <input
               id="ap-stock"
-              name="in_stock"
+              name="inStock"
               type="number"
               required
               min={0}
