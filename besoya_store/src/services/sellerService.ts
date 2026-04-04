@@ -31,6 +31,12 @@ export interface SellerAuthResponse {
   };
 }
 
+export interface SellerSessionData {
+  token: string;
+  expiresAt: number;
+  seller: SellerAuthResponse['seller'];
+}
+
 export interface UpdateSellerData {
   seller_name?: string;
   email?: string;
@@ -39,6 +45,70 @@ export interface UpdateSellerData {
 }
 
 export class SellerService {
+  private static readonly SELLER_AUTH_KEY = 'sellerAuth';
+  /** Matches backend JWT expiry (1h) */
+  private static readonly SELLER_SESSION_MS = 60 * 60 * 1000;
+
+  static saveSellerAuth(auth: SellerAuthResponse): void {
+    const data: SellerSessionData = {
+      token: auth.token,
+      expiresAt: Date.now() + this.SELLER_SESSION_MS,
+      seller: auth.seller,
+    };
+    localStorage.setItem(this.SELLER_AUTH_KEY, JSON.stringify(data));
+  }
+
+  static getSellerToken(): string | null {
+    const raw = localStorage.getItem(this.SELLER_AUTH_KEY);
+    if (!raw) return null;
+    try {
+      const data: SellerSessionData = JSON.parse(raw);
+      if (Date.now() >= data.expiresAt) {
+        this.clearSellerAuth();
+        return null;
+      }
+      return data.token;
+    } catch {
+      this.clearSellerAuth();
+      return null;
+    }
+  }
+
+  static getSellerSessionSeller(): SellerAuthResponse['seller'] | null {
+    const raw = localStorage.getItem(this.SELLER_AUTH_KEY);
+    if (!raw) return null;
+    try {
+      const data: SellerSessionData = JSON.parse(raw);
+      if (Date.now() >= data.expiresAt) {
+        this.clearSellerAuth();
+        return null;
+      }
+      return data.seller;
+    } catch {
+      return null;
+    }
+  }
+
+  static isSellerLoggedIn(): boolean {
+    return this.getSellerToken() !== null;
+  }
+
+  static clearSellerAuth(): void {
+    localStorage.removeItem(this.SELLER_AUTH_KEY);
+  }
+
+  /** Prefer seller JWT for seller API calls */
+  static getSellerAuthHeaders(): Record<string, string> {
+    const token = this.getSellerToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
+  private static requestAuthHeaders(): Record<string, string> {
+    const sellerHeaders = this.getSellerAuthHeaders();
+    if (Object.keys(sellerHeaders).length > 0) return sellerHeaders;
+    return AuthService.getAuthHeaders();
+  }
+
   static async signup(data: SellerSignupData): Promise<SellerAuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers`, {
@@ -96,7 +166,7 @@ export class SellerService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
@@ -111,6 +181,30 @@ export class SellerService {
     }
   }
 
+  static async getSeller(sellerID: number): Promise<Seller> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sellers/${sellerID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.requestAuthHeaders(),
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          (errorData as { error?: string }).error || 'Failed to fetch seller',
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Fetch seller error:', error);
+      throw error;
+    }
+  }
+
   static async updateSeller(
     sellerID: number,
     data: UpdateSellerData,
@@ -120,7 +214,7 @@ export class SellerService {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
         body: JSON.stringify(data),
       });
@@ -143,7 +237,7 @@ export class SellerService {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 

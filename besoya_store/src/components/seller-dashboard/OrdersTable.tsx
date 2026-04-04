@@ -1,50 +1,106 @@
-import { useState, useMemo } from "react";
-import { ORDERS, ORDER_STATUSES } from "../../data/mock-data";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  OrderService,
+  type Order,
+} from "../../services/orderService";
 import { orderStatusTag, payStatusTag } from "../../utils/seller-dashboard-helpers";
 
-export const OrdersTable = () => {
-  const [searchOrder, setSearchOrder] = useState<string>("");
+export interface OrdersTableProps {
+  sellerId: number | null;
+}
+
+const ORDER_STATUS_FILTERS: Order["order_status"][] = [
+  "Started",
+  "In Transit",
+  "Left Transit",
+  "Delivered",
+  "Returning",
+  "Returned",
+  "Cancelled",
+];
+
+function formatMoney(value: number | string | undefined): string {
+  const n = Number(value);
+  if (Number.isNaN(n)) return "—";
+  return `₹${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
+export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [searchOrder, setSearchOrder] = useState("");
   const [filterOrderStatus, setFilterOrderStatus] = useState<string>("all");
 
-  const filteredOrders = useMemo(() => {
-    let result = ORDERS;
-
-    if (filterOrderStatus !== "all") {
-      result = result.filter((o: any) => o.status === filterOrderStatus);
+  const loadOrders = useCallback(async () => {
+    if (sellerId == null) return;
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const rows = await OrderService.getOrdersBySellerID(sellerId);
+      setOrders(rows);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : "Failed to load orders");
+      setOrders([]);
+    } finally {
+      setLoading(false);
     }
+  }, [sellerId]);
 
+  useEffect(() => {
+    void loadOrders();
+  }, [loadOrders]);
+
+  const filteredOrders = useMemo(() => {
+    let result = orders;
+    if (filterOrderStatus !== "all") {
+      result = result.filter((o) => o.order_status === filterOrderStatus);
+    }
     if (searchOrder.trim()) {
       const q = searchOrder.toLowerCase();
       result = result.filter(
-        (o: any) =>
-          o.id.toLowerCase().includes(q) ||
-          o.product.toLowerCase().includes(q) ||
-          o.buyer.toLowerCase().includes(q)
+        (o) =>
+          o.order_number.toLowerCase().includes(q) ||
+          String(o.order_id).includes(q) ||
+          String(o.product_id).includes(q) ||
+          String(o.user_id).includes(q) ||
+          o.deliver_to.toLowerCase().includes(q),
       );
     }
-
     return result;
-  }, [searchOrder, filterOrderStatus]);
+  }, [orders, searchOrder, filterOrderStatus]);
+
+  if (sellerId == null) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state__text">Seller ID is missing. Sign in again.</div>
+      </div>
+    );
+  }
 
   return (
     <>
+      {fetchError ? <p role="alert">{fetchError}</p> : null}
+
       <div className="toolbar">
         <div className="search-box">
           <span className="search-box__icon">🔍</span>
           <input
             type="text"
-            placeholder="Search by order ID, product, or buyer..."
+            placeholder="Search order_number, order_id, product_id, user_id, deliver_to…"
             value={searchOrder}
             onChange={(e) => setSearchOrder(e.target.value)}
+            disabled={loading}
           />
         </div>
         <select
           className="filter-select"
           value={filterOrderStatus}
           onChange={(e) => setFilterOrderStatus(e.target.value)}
+          disabled={loading}
         >
           <option value="all">All Statuses</option>
-          {ORDER_STATUSES.map((status: string) => (
+          {ORDER_STATUS_FILTERS.map((status) => (
             <option key={status} value={status}>
               {status}
             </option>
@@ -53,60 +109,57 @@ export const OrdersTable = () => {
       </div>
 
       <div className="table-wrap">
-        {filteredOrders.length === 0 ? (
+        {!loading && filteredOrders.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state__icon">📋</div>
             <div className="empty-state__text">No orders found</div>
           </div>
-        ) : (
+        ) : null}
+
+        {loading ? (
+          <p>Loading orders…</p>
+        ) : null}
+
+        {filteredOrders.length > 0 ? (
           <table className="tbl">
             <thead>
               <tr>
-                <th>Order</th>
-                <th>Product</th>
-                <th>Date / Time</th>
-                <th>Buyer</th>
-                <th>Address</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>order_number</th>
+                <th>order_id</th>
+                <th>product_id</th>
+                <th>user_id</th>
+                <th>variation_label</th>
+                <th>quantity</th>
+                <th>deliver_to</th>
+                <th>unit_price</th>
+                <th>total_price</th>
+                <th>payment_status</th>
+                <th>order_status</th>
+                <th>order_date</th>
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order: any) => {
-                const orderStatusInfo = orderStatusTag(order.status);
-                const payStatusInfo = payStatusTag(order.payment);
+              {filteredOrders.map((order) => {
+                const orderStatusInfo = orderStatusTag(order.order_status);
+                const payStatusInfo = payStatusTag(order.payment_status);
                 return (
-                  <tr key={order.id}>
+                  <tr key={order.order_id}>
                     <td>
-                      <span className="order-id">
-                        {order.id.split("-").slice(0, 2).join("-")}
-                        <br />
-                        <span className="order-num">
-                          {order.id.split("-")[2]}
-                        </span>
-                      </span>
+                      <span className="order-id">{order.order_number}</span>
                     </td>
-                    <td>{order.product}</td>
-                    <td>{order.datetime}</td>
-                    <td>{order.buyer}</td>
+                    <td>{order.order_id}</td>
+                    <td>{order.product_id}</td>
+                    <td>{order.user_id}</td>
+                    <td>{order.variation_label ?? "—"}</td>
+                    <td>{order.quantity}</td>
                     <td>
-                      <div className="addr-cell">{order.address}</div>
+                      <div className="addr-cell">{order.deliver_to}</div>
                     </td>
+                    <td>{formatMoney(order.unit_price)}</td>
+                    <td>{formatMoney(order.total_price)}</td>
                     <td>
-                      <div>
-                        <div className={`tag ${payStatusInfo.color}`}>
-                          {payStatusInfo.text}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            color: "#999",
-                            marginTop: "3px",
-                          }}
-                        >
-                          {order.paymentMethod}
-                        </div>
+                      <div className={`tag ${payStatusInfo.color}`}>
+                        {payStatusInfo.text}
                       </div>
                     </td>
                     <td>
@@ -114,20 +167,25 @@ export const OrdersTable = () => {
                         {orderStatusInfo.text}
                       </span>
                     </td>
-                    <td>
-                      <button className="btn btn--ghost">View</button>
+                    <td style={{ fontSize: 12 }}>
+                      {order.order_date
+                        ? new Date(order.order_date).toLocaleString()
+                        : "—"}
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        )}
+        ) : null}
+
         {filteredOrders.length > 0 && (
           <div className="pagination">
             <span>{filteredOrders.length} orders</span>
             <div className="pagination__pages">
-              <button className="page-btn page-btn--active">1</button>
+              <button type="button" className="page-btn page-btn--active">
+                1
+              </button>
             </div>
           </div>
         )}

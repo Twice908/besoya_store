@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { SellerService } from '../services/sellerService';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -26,10 +27,9 @@ export const ProtectedRoute = ({ children, redirectTo = '/login' }: ProtectedRou
     );
   }
 
-  // Check if user is authenticated
-  if (!isAuthenticated) {
-    // Redirect to login with the current location as state
-    // so we can redirect back after login
+  const sellerOk = SellerService.isSellerLoggedIn();
+
+  if (!isAuthenticated && !sellerOk) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 

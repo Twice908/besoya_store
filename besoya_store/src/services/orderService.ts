@@ -1,4 +1,5 @@
 import { AuthService } from './authService';
+import { SellerService } from './sellerService';
 
 const API_BASE_URL = 'https://besoya-store-api.onrender.com';
 
@@ -67,13 +68,18 @@ export interface UpdateOrderData {
 }
 
 export class OrderService {
+  private static requestAuthHeaders(): Record<string, string> {
+    const seller = SellerService.getSellerAuthHeaders();
+    return Object.keys(seller).length > 0 ? seller : AuthService.getAuthHeaders();
+  }
+
   static async createOrder(data: CreateOrderData): Promise<Order> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
         body: JSON.stringify(data),
       });
@@ -96,7 +102,7 @@ export class OrderService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
@@ -117,7 +123,7 @@ export class OrderService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
@@ -140,7 +146,7 @@ export class OrderService {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...AuthService.getAuthHeaders(),
+            ...this.requestAuthHeaders(),
           },
         },
       );
@@ -165,7 +171,7 @@ export class OrderService {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
         body: JSON.stringify(data),
       });
@@ -188,7 +194,7 @@ export class OrderService {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          ...AuthService.getAuthHeaders(),
+          ...this.requestAuthHeaders(),
         },
       });
 
