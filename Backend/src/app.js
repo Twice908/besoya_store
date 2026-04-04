@@ -32,13 +32,7 @@ app.use(cors({
 
     const allowedOrigins = [
       "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "http://localhost:5176",
-      "http://localhost:5177",
-      "https://twice908.github.io/besoya_store/",
-      "https://besoya-store.vercel.app",
-      "https://besoya-store.netlify.app"
+      "https://twice908.github.io",
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1) {
