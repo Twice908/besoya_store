@@ -36,7 +36,7 @@ jobs:
       - name: Upload Build Files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: besoya_store/build   # or dist (see below)
+          path: dist   # or dist (see below)
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
