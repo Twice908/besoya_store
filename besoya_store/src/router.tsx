@@ -5,7 +5,10 @@ import SignUpPage from './pages/sign_up_page';
 import ForgotPasswordPage from './pages/forgot_password_page';
 import HomeScreenPage from './pages/home_screen';
 import ProductDetailsPage from './pages/product_details_page';
+import OrdersPage from './pages/orders_page';
+import CheckoutPage from './pages/checkout_page';
 import DashboardPage from './pages/dashboard_page';
+import UserProfilePage from './pages/user_profile_page';
 
 export const AppRoutes = () => {
   return (
@@ -57,10 +60,34 @@ export const AppRoutes = () => {
         }
       />
       <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <OrdersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfilePage />
           </ProtectedRoute>
         }
       />

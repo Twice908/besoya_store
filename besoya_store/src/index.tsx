@@ -1135,8 +1135,12 @@ const GlobalStyles = () => (
     .pdp-gallery {
       position: sticky;
       top: 88px;
+      display: flex;
+      justify-content: center;
     }
     .pdp-main-img {
+      width: 540px;
+      max-width: 540px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px;
@@ -1149,6 +1153,16 @@ const GlobalStyles = () => (
       overflow: hidden;
       margin-bottom: 14px;
       transition: background .2s;
+    }
+    .pdp-main-img__content,
+    .pdp-main-img__fallback {
+      width: 100%;
+      height: 100%;
+    }
+    .pdp-main-img__content {
+      object-fit: cover;
+      object-position: center;
+      display: block;
     }
     .pdp-main-img:hover { background: #e8e8e8; }
     .pdp-img-badge {
@@ -1773,10 +1787,14 @@ const GlobalStyles = () => (
     /* ============================================================
        RESPONSIVE
        ============================================================ */
+    @media (max-width: 980px) {
+      .pdp-main-img { width: min(100%, 480px); max-width: 480px; height: 360px; font-size: 110px; }
+    }
+
     @media (max-width: 860px) {
       .pdp-body { grid-template-columns: 1fr; gap: 28px; padding: 24px 20px 48px; }
       .pdp-gallery { position: static; }
-      .pdp-main-img { height: 300px; font-size: 100px; }
+      .pdp-main-img { width: 100%; max-width: 100%; height: 300px; font-size: 100px; }
       .pdp-title { font-size: 24px; }
       .pdp-price { font-size: 28px; }
       .pdp-tabs-section { padding: 0 20px 48px; }

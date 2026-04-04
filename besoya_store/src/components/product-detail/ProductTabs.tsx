@@ -1,14 +1,27 @@
 import { useState } from "react";
 import { EXTENDED_PRODUCT_DATA } from "./ProductDetailData";
 import { StarsRow } from "./ProductDetailHelpers";
-import type { Product } from "../home";
+import type { Product as APIProduct } from "../../services/productService";
+
+type ProductTabsProduct = APIProduct & Partial<{
+  id: number;
+  name: string;
+  inStock: number;
+  originalPrice: number;
+  discount: number;
+  rating: number;
+  reviews: number;
+}>;
 
 interface ProductTabsProps {
-  product: Product;
+  product: ProductTabsProduct;
 }
 
 const ProductTabs = ({ product }: ProductTabsProps) => {
-  const ext = EXTENDED_PRODUCT_DATA[product.id] || EXTENDED_PRODUCT_DATA.default;
+  const productId = product.product_id ?? product.id ?? 0;
+  const productRating = product.rating ?? 0;
+  const reviewCount = product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
+  const ext = EXTENDED_PRODUCT_DATA[productId] || EXTENDED_PRODUCT_DATA.default;
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
@@ -57,9 +70,9 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
           <div className="pdp-reviews">
             <div className="pdp-reviews-summary">
               <div className="pdp-reviews-summary__rating">
-                <div className="pdp-reviews-summary__score">{product.rating}</div>
-                <StarsRow rating={product.rating} />
-                <div className="pdp-reviews-summary__count">{product.reviews.toLocaleString()} reviews</div>
+                <div className="pdp-reviews-summary__score">{productRating}</div>
+                <StarsRow rating={productRating} />
+                <div className="pdp-reviews-summary__count">{reviewCount.toLocaleString()} reviews</div>
               </div>
               <div className="pdp-reviews-summary__breakdown">
                 {[5, 4, 3, 2, 1].map(star => (

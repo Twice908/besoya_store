@@ -175,19 +175,7 @@ app.post("/api/sellers", async (req, res) => {
 // ------ User Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
-  const authHeader = req.headers["authorization"];
-  const headerToken = authHeader && authHeader.split(" ")[1];
 
-  if (headerToken) {
-    try {
-      const payload = jwt.verify(headerToken, JWT_SECRET);
-      if (payload && payload.email && payload.email !== email) {
-        return res.status(401).json({ error: "Token email does not match login email" });
-      }
-    } catch (err) {
-      return res.status(401).json({ error: "Invalid auth token" });
-    }
-  }
 
   try {
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [
@@ -298,6 +286,23 @@ app.get("/api/users", authenticateToken, async (req, res) => {
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("❌ Error fetching users:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+// ── GET single user ──────────────────────────────────────────
+app.get("/api/users/:user_id", authenticateToken, async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT user_id, first_name, last_name, email, mobile, address_line, area, landmark, city, postal_code, address_type, delivery_pref, created_at FROM users WHERE user_id = $1",
+      [user_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error fetching user:", err.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
