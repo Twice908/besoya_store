@@ -29,7 +29,7 @@ const LoginPage = () => {
       // Redirect to the page user was trying to access, or home
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,8 @@ const LoginPage = () => {
         <div className="welcome">
           <h1 className="welcome__title">Welcome back 👋</h1>
           <p className="welcome__sub">
-            Sign in to your Besoya account and continue<br />
+            Sign in to your Besoya account and continue
+            <br />
             your premium shopping experience.
           </p>
         </div>
@@ -52,28 +53,32 @@ const LoginPage = () => {
         {/* Login Form */}
         <form onSubmit={handleSubmit}>
           {error && (
-            <div style={{
-              color: 'var(--danger)',
-              background: 'rgba(204, 51, 51, 0.1)',
-              padding: '12px',
-              borderRadius: '8px',
-              marginBottom: '16px',
-              fontSize: '14px'
-            }}>
+            <div
+              style={{
+                color: "var(--danger)",
+                background: "rgba(204, 51, 51, 0.1)",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "16px",
+                fontSize: "14px",
+              }}
+            >
               {error}
             </div>
           )}
 
           {/* Email Field */}
           <div className="field" style={{ marginBottom: 16 }}>
-            <label className="field__label" htmlFor="login-email">Email Address</label>
+            <label className="field__label" htmlFor="login-email">
+              Email Address
+            </label>
             <input
               id="login-email"
               type="email"
               className="field__input"
               placeholder="you@example.com"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
             />
@@ -84,25 +89,43 @@ const LoginPage = () => {
             id="login-password"
             label="Password"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
             disabled={loading}
           />
 
           {/* Forgot Password */}
-          <div className="forgot-row" style={{ marginTop: 10, marginBottom: 22 }}>
-            <button type="button" className="link-btn" onClick={() => navigate("/forgot-password")} disabled={loading}>
+          <div
+            className="forgot-row"
+            style={{ marginTop: 10, marginBottom: 22 }}
+          >
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => navigate("/forgot-password")}
+              disabled={loading}
+            >
               Forgot password?
             </button>
           </div>
 
           <button type="submit" className="btn btn--primary" disabled={loading}>
-            {loading ? 'Signing In...' : 'Sign In →'}
+            {loading ? "Signing In..." : "Sign In →"}
           </button>
         </form>
 
+        <div style={{ marginTop: 12 }}>
+          <button type="button" onClick={() => navigate("/seller/login")}>
+            Login as Seller
+          </button>
+        </div>
+
         <div className="form-foot" style={{ marginTop: 24 }}>
           Don't have an account?{" "}
-          <button className="link-btn" onClick={() => navigate("/signup")}>Create one</button>
+          <button className="link-btn" onClick={() => navigate("/signup")}>
+            Create one
+          </button>
         </div>
       </div>
     </div>
