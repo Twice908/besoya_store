@@ -990,6 +990,8 @@ const GlobalStyles = () => (
     .p-card:nth-child(11) { animation-delay: .44s; }
     .p-card:nth-child(12) { animation-delay: .48s; }
     .p-card__img-wrap { position: relative; background: var(--surface); height: 190px; display: flex; align-items: center; justify-content: center; font-size: 68px; overflow: hidden; }
+    .p-card__img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
+    .p-card__img-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
     .p-card__badge { position: absolute; top: 10px; left: 10px; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 5px; letter-spacing: .3px; }
     .p-card__badge--sale { background: #cc3333; }
     .p-card__badge--new { background: #1a5fd4; }
@@ -1231,7 +1233,7 @@ const GlobalStyles = () => (
       height: 100%;
     }
     .pdp-main-img__content {
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
       display: block;
     }

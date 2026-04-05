@@ -34,11 +34,6 @@ const ProductCard = ({ product, onAddToCart, onView }: ProductCardProps) => {
             src={product.product_image}
             alt={product.product_name}
             className="p-card__img"
-            onError={(e) => {
-              // Fallback to emoji if image fails to load
-              e.currentTarget.style.display = "none";
-              e.currentTarget.nextElementSibling!.textContent = "📦";
-            }}
           />
         ) : (
           <div className="p-card__img-placeholder">📦</div>

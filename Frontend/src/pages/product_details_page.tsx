@@ -21,6 +21,7 @@ const ProductDetailsPage = () => {
   const [detailCartItems, setDetailCartItems] = useState<Product[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, name: "" });
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,6 +43,10 @@ const ProductDetailsPage = () => {
         } else {
           setError("Product not found");
         }
+
+        // Fetch all products for related products section
+        const allProductsData = await ProductService.getAllProducts();
+        setAllProducts(allProductsData);
       } catch (err) {
         console.error("Error fetching product:", err);
         setError(err instanceof Error ? err.message : "Failed to load product");
@@ -133,6 +138,8 @@ const ProductDetailsPage = () => {
       </div> */}
 
       <RelatedProducts
+        products={allProducts}
+        currentProductId={product?.product_id}
         onViewProduct={handleViewProduct}
         onAddToCart={handleAddToCart}
       />
