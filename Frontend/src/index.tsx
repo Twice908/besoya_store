@@ -650,7 +650,28 @@ const GlobalStyles = () => (
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrap::-webkit-scrollbar-track {
+      background: #f5f5f5;
+      border-radius: 10px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
     @media (max-width: 768px) {
       .table-wrap {
         overflow-x: auto;
@@ -661,6 +682,7 @@ const GlobalStyles = () => (
     .tbl {
       width: 100%;
       border-collapse: collapse;
+      min-width: 800px;
     }
     .tbl thead tr {
       border-bottom: 1px solid #e0e0e0;
