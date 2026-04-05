@@ -35,7 +35,7 @@ const SignUpPage = () => {
 
   // Get email and message from login redirect if available
   const redirectEmail = (location.state as any)?.email || "";
-  const redirectMessage = (location.state as any)?.message || "";
+  // const redirectMessage = (location.state as any)?.message || "";
 
   const [form, setForm] = useState<SignUpForm>({
     firstName: "",
