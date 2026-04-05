@@ -141,17 +141,20 @@ export class OrderService {
 
   static async createOrder(data: CreateOrderData): Promise<Order> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       console.log("[createOrder] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: "POST",
@@ -168,17 +171,20 @@ export class OrderService {
 
   static async getAllOrders(): Promise<Order[]> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       console.log("[getAllOrders] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: "GET",
@@ -194,17 +200,20 @@ export class OrderService {
 
   static async getOrdersByUserID(userID: number): Promise<Order[]> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       console.log("[getOrdersByUserID] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(
         `${API_BASE_URL}/api/orders/user/${userID}`,
@@ -226,17 +235,20 @@ export class OrderService {
 
   static async getOrdersBySellerID(sellerID: number): Promise<Order[]> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       console.log("[getOrdersBySellerID] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(
         `${API_BASE_URL}/api/orders/seller/${sellerID}`,
@@ -261,17 +273,20 @@ export class OrderService {
     data: UpdateOrderData,
   ): Promise<Order> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       console.log("[updateOrder] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(`${API_BASE_URL}/api/orders/${orderID}`, {
         method: "PUT",
@@ -302,22 +317,25 @@ export class OrderService {
       | "Cancelled",
   ): Promise<Order> {
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...this.requestAuthHeaders(),
-      };
+      const authHeaders = this.requestAuthHeaders();
+      const authValue = authHeaders.Authorization
+        ? authHeaders.Authorization.substring(0, 20) + "..."
+        : "NO AUTH HEADER";
 
       // Log the request for debugging
       console.log("[updateOrderStatus] Request headers:", {
-        "Content-Type": headers["Content-Type"],
-        Authorization: headers["Authorization"]
-          ? headers["Authorization"].substring(0, 20) + "..."
-          : "NO AUTH HEADER",
+        "Content-Type": "application/json",
+        Authorization: authValue,
       });
       console.log("[updateOrderStatus] Request body:", {
         payment_status,
         order_status,
       });
+
+      const headers = {
+        "Content-Type": "application/json",
+        ...authHeaders,
+      };
 
       const response = await fetch(
         `${API_BASE_URL}/api/orders/${orderID}/update-status`,
