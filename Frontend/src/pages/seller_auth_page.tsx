@@ -1,25 +1,25 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { SellerService } from '../services/sellerService';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { SellerService } from "../services/sellerService";
 
-type SellerAuthView = 'login' | 'signup' | 'forgot';
+type SellerAuthView = "login" | "signup" | "forgot";
 
 const SellerAuthPage = () => {
   const navigate = useNavigate();
-  const [view, setView] = useState<SellerAuthView>('login');
+  const [view, setView] = useState<SellerAuthView>("login");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState<string | null>(null);
 
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
-  const [signupName, setSignupName] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupMobile, setSignupMobile] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupMobile, setSignupMobile] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
 
-  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const setViewClearing = useCallback((next: SellerAuthView) => {
     setError(null);
@@ -31,7 +31,7 @@ const SellerAuthPage = () => {
     if (SellerService.isSellerLoggedIn()) {
       const seller = SellerService.getSellerSessionSeller();
       const token = SellerService.getSellerToken();
-      navigate('/dashboard', {
+      navigate("/dashboard", {
         replace: true,
         state: {
           sellerId: seller?.seller_id,
@@ -42,7 +42,7 @@ const SellerAuthPage = () => {
   }, [navigate]);
 
   const goDashboard = (sellerId: number, token: string) => {
-    navigate('/dashboard', {
+    navigate("/dashboard", {
       replace: true,
       state: { sellerId, token },
     });
@@ -53,6 +53,14 @@ const SellerAuthPage = () => {
     setError(null);
     setLoading(true);
     try {
+      const emailExists = await SellerService.checkSellerExists(loginEmail);
+      if (!emailExists) {
+        setView("signup");
+        setSignupEmail(loginEmail);
+        setLoading(false);
+        return;
+      }
+
       const res = await SellerService.login({
         email: loginEmail,
         password: loginPassword,
@@ -60,7 +68,7 @@ const SellerAuthPage = () => {
       SellerService.saveSellerAuth(res);
       goDashboard(res.seller.seller_id, res.token);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -80,7 +88,7 @@ const SellerAuthPage = () => {
       SellerService.saveSellerAuth(res);
       goDashboard(res.seller.seller_id, res.token);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign up failed');
+      setError(err instanceof Error ? err.message : "Sign up failed");
     } finally {
       setLoading(false);
     }
@@ -89,7 +97,7 @@ const SellerAuthPage = () => {
   const handleForgot = (e: React.FormEvent) => {
     e.preventDefault();
     setForgotMessage(
-      'Password reset is not available yet. Please contact support if you need help.',
+      "Password reset is not available yet. Please contact support if you need help.",
     );
   };
 
@@ -99,7 +107,7 @@ const SellerAuthPage = () => {
 
       {error ? <p role="alert">{error}</p> : null}
 
-      {view === 'login' && (
+      {view === "login" && (
         <section aria-labelledby="seller-login-heading">
           <h2 id="seller-login-heading">Login</h2>
           <form onSubmit={handleLogin}>
@@ -128,23 +136,23 @@ const SellerAuthPage = () => {
               />
             </div>
             <button type="submit" disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? "Signing in…" : "Sign in"}
             </button>
           </form>
           <p>
-            <button type="button" onClick={() => setViewClearing('signup')}>
+            <button type="button" onClick={() => setViewClearing("signup")}>
               Create seller account
             </button>
           </p>
           <p>
-            <button type="button" onClick={() => setViewClearing('forgot')}>
+            <button type="button" onClick={() => setViewClearing("forgot")}>
               Forgot password
             </button>
           </p>
         </section>
       )}
 
-      {view === 'signup' && (
+      {view === "signup" && (
         <section aria-labelledby="seller-signup-heading">
           <h2 id="seller-signup-heading">Sign up</h2>
           <form onSubmit={handleSignup}>
@@ -198,18 +206,18 @@ const SellerAuthPage = () => {
               />
             </div>
             <button type="submit" disabled={loading}>
-              {loading ? 'Creating account…' : 'Sign up'}
+              {loading ? "Creating account…" : "Sign up"}
             </button>
           </form>
           <p>
-            <button type="button" onClick={() => setViewClearing('login')}>
+            <button type="button" onClick={() => setViewClearing("login")}>
               Back to login
             </button>
           </p>
         </section>
       )}
 
-      {view === 'forgot' && (
+      {view === "forgot" && (
         <section aria-labelledby="seller-forgot-heading">
           <h2 id="seller-forgot-heading">Forgot password</h2>
           {forgotMessage ? <p>{forgotMessage}</p> : null}
@@ -229,7 +237,7 @@ const SellerAuthPage = () => {
             <button type="submit">Request reset</button>
           </form>
           <p>
-            <button type="button" onClick={() => setViewClearing('login')}>
+            <button type="button" onClick={() => setViewClearing("login")}>
               Back to login
             </button>
           </p>
