@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { OrderService } from "../services/orderService";
 import type { Order } from "../services/orderService";
 import { AuthService } from "../services/authService";
 
 const OrdersPage = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,9 @@ const OrdersPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const fetchedOrders = await OrderService.getOrdersByUserID(user.user_id);
+        const fetchedOrders = await OrderService.getOrdersByUserID(
+          user.user_id,
+        );
         setOrders(fetchedOrders);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
@@ -46,7 +50,27 @@ const OrdersPage = () => {
   };
 
   return (
-    <div style={{ padding: "36px 24px 48px", maxWidth: 1200, margin: "0 auto" }}>
+    <div
+      style={{ padding: "36px 24px 48px", maxWidth: 1200, margin: "0 auto" }}
+    >
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          background: "transparent",
+          border: "1px solid var(--border)",
+          borderRadius: 8,
+          padding: "10px 14px",
+          color: "var(--text)",
+          cursor: "pointer",
+          marginBottom: 20,
+        }}
+      >
+        ← Back
+      </button>
       <div className="section-head" style={{ marginBottom: 28 }}>
         <div>
           <h2 className="section-head__title">My Orders</h2>
@@ -98,8 +122,8 @@ const OrdersPage = () => {
                         order.order_status === "Delivered"
                           ? "tag--green"
                           : order.order_status === "Cancelled"
-                          ? "tag--red"
-                          : "tag--blue"
+                            ? "tag--red"
+                            : "tag--blue"
                       }`}
                     >
                       {order.order_status}

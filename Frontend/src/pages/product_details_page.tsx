@@ -4,9 +4,9 @@ import {
   ProductDetailNavbar,
   ProductGallery,
   ProductInfo,
-  ProductTabs,
   RelatedProducts,
 } from "../components/product-detail";
+import { CartSidebar, CartToast } from "../components/home";
 import { ProductService } from "../services/productService";
 import type { Product } from "../services/productService";
 
@@ -18,6 +18,9 @@ const ProductDetailsPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [detailCartItems, setDetailCartItems] = useState<Product[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [toast, setToast] = useState({ visible: false, name: "" });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -51,12 +54,36 @@ const ProductDetailsPage = () => {
   }, [id, location.state]);
 
   const handleAddToCart = (product: Product, qty: number, price: number) => {
-    // Cart handling can be done here or through a context/state management
-    console.log("Added to cart:", { product, qty, price });
+    const item = { ...product, price };
+    setDetailCartItems((current) => [...current, ...Array(qty).fill(item)]);
+    setToast({ visible: true, name: product.product_name });
+    setCartOpen(true);
+    setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2800);
   };
 
   const handleViewProduct = (product: Product) => {
     navigate(`/product/${product.product_id}`, { state: { product } });
+  };
+
+  const handleUpdateQty = (productId: number, delta: -1 | 1) => {
+    if (delta === -1) {
+      const idx = detailCartItems.findIndex((p) => p.product_id === productId);
+      if (idx !== -1)
+        setDetailCartItems((c) => [...c.slice(0, idx), ...c.slice(idx + 1)]);
+    } else {
+      if (product && product.product_id === productId) {
+        setDetailCartItems((c) => [...c, { ...product, price: product.price }]);
+      }
+    }
+  };
+
+  const handleRemove = (productId: number) => {
+    setDetailCartItems((c) => c.filter((p) => p.product_id !== productId));
+  };
+
+  const handleClear = () => {
+    setDetailCartItems([]);
+    setCartOpen(false);
   };
 
   if (loading) {
@@ -101,14 +128,25 @@ const ProductDetailsPage = () => {
         <ProductInfo product={product} onAddToCart={handleAddToCart} />
       </div>
 
-      <div className="pdp-tabs-section">
+      {/* <div className="pdp-tabs-section">
         <ProductTabs product={product} />
-      </div>
+      </div> */}
 
       <RelatedProducts
         onViewProduct={handleViewProduct}
         onAddToCart={handleAddToCart}
       />
+
+      <CartSidebar
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={detailCartItems}
+        onUpdateQty={handleUpdateQty}
+        onRemove={handleRemove}
+        onClear={handleClear}
+      />
+
+      <CartToast visible={toast.visible} name={toast.name} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   HomeNavbar,
   CategoryBar,
+  IconSearch,
   HeroBanner,
   ProductCard,
   HomeFooter,
@@ -20,6 +21,7 @@ const HomeScreen = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState("popular");
+  const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState({ visible: false, name: "" });
   const [cartOpen, setCartOpen] = useState(false);
   const [localCartItems, setLocalCartItems] = useState<Product[]>([]);
@@ -116,6 +118,21 @@ const HomeScreen = () => {
         onCartClick={handleCartClick}
         onOrdersClick={() => navigate("/orders")}
       />
+      <div className="home-search-wrapper">
+        <div className="nav-search">
+          <span className="nav-search__icon">
+            <IconSearch />
+          </span>
+          <input
+            className="nav-search__input"
+            type="text"
+            placeholder="Search for products, brands and more…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button className="nav-search__btn">Search</button>
+        </div>
+      </div>
       <CategoryBar active={activeCategory} setActive={setActiveCategory} />
       <div className="home-shell">
         {activeCategory === "all" && <HeroBanner />}
