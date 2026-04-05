@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { UserService, type User, type UpdateUserData } from '../services/userService';
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  UserService,
+  type User,
+  type UpdateUserData,
+} from "../services/userService";
+import "./user_profile_page.css";
 
 const UserProfilePage = () => {
   const { user: authUser } = useAuth();
@@ -10,13 +15,7 @@ const UserProfilePage = () => {
   const [formData, setFormData] = useState<UpdateUserData>({});
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (authUser) {
-      fetchUserDetails();
-    }
-  }, [authUser]);
-
-  const fetchUserDetails = async () => {
+  const fetchUserDetails = useCallback(async () => {
     if (!authUser) return;
     try {
       const userData = await UserService.getUser(authUser.user_id);
@@ -26,20 +25,26 @@ const UserProfilePage = () => {
         last_name: userData.last_name,
         email: userData.email,
         mobile: userData.mobile,
-        address_line: userData.address_line || '',
-        area: userData.area || '',
-        landmark: userData.landmark || '',
-        city: userData.city || '',
-        postal_code: userData.postal_code || '',
-        address_type: userData.address_type || '',
-        delivery_pref: userData.delivery_pref || '',
+        address_line: userData.address_line || "",
+        area: userData.area || "",
+        landmark: userData.landmark || "",
+        city: userData.city || "",
+        postal_code: userData.postal_code || "",
+        address_type: userData.address_type || "",
+        delivery_pref: userData.delivery_pref || "",
       });
     } catch (error) {
-      console.error('Failed to fetch user details:', error);
+      console.error("Failed to fetch user details:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [authUser]);
+
+  useEffect(() => {
+    if (authUser) {
+      fetchUserDetails();
+    }
+  }, [authUser, fetchUserDetails]);
 
   const handleEdit = () => {
     setEditing(true);
@@ -53,13 +58,13 @@ const UserProfilePage = () => {
         last_name: user.last_name,
         email: user.email,
         mobile: user.mobile,
-        address_line: user.address_line || '',
-        area: user.area || '',
-        landmark: user.landmark || '',
-        city: user.city || '',
-        postal_code: user.postal_code || '',
-        address_type: user.address_type || '',
-        delivery_pref: user.delivery_pref || '',
+        address_line: user.address_line || "",
+        area: user.area || "",
+        landmark: user.landmark || "",
+        city: user.city || "",
+        postal_code: user.postal_code || "",
+        address_type: user.address_type || "",
+        delivery_pref: user.delivery_pref || "",
       });
     }
   };
@@ -72,15 +77,17 @@ const UserProfilePage = () => {
       setUser(updatedUser);
       setEditing(false);
     } catch (error) {
-      console.error('Failed to update user:', error);
+      console.error("Failed to update user:", error);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const formatAddress = (user: User) => {
@@ -92,7 +99,7 @@ const UserProfilePage = () => {
       user.postal_code,
       user.address_type,
     ].filter(Boolean);
-    return parts.join(', ') || 'Not provided';
+    return parts.join(", ") || "Not provided";
   };
 
   if (loading) {
@@ -122,9 +129,11 @@ const UserProfilePage = () => {
           </div>
           <div className="detail-item">
             <label>Delivery Preference:</label>
-            <span>{user.delivery_pref || 'Not specified'}</span>
+            <span>{user.delivery_pref || "Not specified"}</span>
           </div>
-          <button onClick={handleEdit} className="edit-btn">Edit</button>
+          <button onClick={handleEdit} className="edit-btn">
+            Edit
+          </button>
         </div>
       ) : (
         <div className="profile-edit">
@@ -133,7 +142,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="first_name"
-              value={formData.first_name || ''}
+              value={formData.first_name || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -142,7 +151,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="last_name"
-              value={formData.last_name || ''}
+              value={formData.last_name || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -151,7 +160,7 @@ const UserProfilePage = () => {
             <input
               type="email"
               name="email"
-              value={formData.email || ''}
+              value={formData.email || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -160,7 +169,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="mobile"
-              value={formData.mobile || ''}
+              value={formData.mobile || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -169,7 +178,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="address_line"
-              value={formData.address_line || ''}
+              value={formData.address_line || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -178,7 +187,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="area"
-              value={formData.area || ''}
+              value={formData.area || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -187,7 +196,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="landmark"
-              value={formData.landmark || ''}
+              value={formData.landmark || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -196,7 +205,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="city"
-              value={formData.city || ''}
+              value={formData.city || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -205,7 +214,7 @@ const UserProfilePage = () => {
             <input
               type="text"
               name="postal_code"
-              value={formData.postal_code || ''}
+              value={formData.postal_code || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -213,7 +222,7 @@ const UserProfilePage = () => {
             <label>Address Type:</label>
             <select
               name="address_type"
-              value={formData.address_type || ''}
+              value={formData.address_type || ""}
               onChange={handleInputChange}
             >
               <option value="">Select</option>
@@ -226,7 +235,7 @@ const UserProfilePage = () => {
             <label>Delivery Preference:</label>
             <select
               name="delivery_pref"
-              value={formData.delivery_pref || ''}
+              value={formData.delivery_pref || ""}
               onChange={handleInputChange}
             >
               <option value="">Select</option>
@@ -237,9 +246,11 @@ const UserProfilePage = () => {
           </div>
           <div className="form-actions">
             <button onClick={handleSave} disabled={saving} className="save-btn">
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? "Saving..." : "Save"}
             </button>
-            <button onClick={handleCancel} className="cancel-btn">Cancel</button>
+            <button onClick={handleCancel} className="cancel-btn">
+              Cancel
+            </button>
           </div>
         </div>
       )}
