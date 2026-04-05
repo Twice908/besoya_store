@@ -190,6 +190,31 @@ export class SellerService {
     }
   }
 
+  static async checkSellerExists(email: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/sellers/check?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to verify seller");
+      }
+
+      const data = await response.json();
+      return data.exists === true;
+    } catch (error) {
+      console.error("Check seller exists error:", error);
+      throw error;
+    }
+  }
+
   static async getAllSellers(): Promise<Seller[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers`, {
