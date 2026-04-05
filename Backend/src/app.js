@@ -232,6 +232,34 @@ app.post("/api/sellers/login", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// ------ User Logout
+app.post("/api/logout", authenticateToken, async (req, res) => {
+  try {
+    // Token is already verified by authenticateToken middleware
+    // Logout is successful if we reach here
+    res.json({
+      message: "User logged out successfully",
+      success: true,
+    });
+  } catch (err) {
+    console.error("❌ Error logging out user:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+// ------ Seller Logout
+app.post("/api/sellers/logout", authenticateToken, async (req, res) => {
+  try {
+    // Token is already verified by authenticateToken middleware
+    // Logout is successful if we reach here
+    res.json({
+      message: "Seller logged out successfully",
+      success: true,
+    });
+  } catch (err) {
+    console.error("❌ Error logging out seller:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 // ------ Add all orders
 app.post("/api/orders", authenticateToken, async (req, res) => {
   const {
