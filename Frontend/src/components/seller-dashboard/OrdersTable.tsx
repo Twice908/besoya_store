@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OrderService, type Order } from "../../services/orderService";
-import {
-  orderStatusTag,
-  payStatusTag,
-} from "../../utils/seller-dashboard-helpers";
+// import {
+//   orderStatusTag,
+//   payStatusTag,
+// } from "../../utils/seller-dashboard-helpers";
 
 export interface OrdersTableProps {
   sellerId: number | null;
