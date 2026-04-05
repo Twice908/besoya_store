@@ -393,6 +393,10 @@ const GlobalStyles = () => (
       from { transform: scale(0); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
     }
+    @keyframes slideUp {
+      from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+      to   { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
     .success-box__title {
       font-family: var(--font-head);
       font-size: 20px; font-weight: 700;
