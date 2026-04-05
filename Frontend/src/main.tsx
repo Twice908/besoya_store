@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import GlobalStyles from './index.tsx'
 import { AuthProvider } from './contexts/AuthContext'
 import { AppRoutes } from './router'
@@ -15,8 +15,8 @@ const RootLayout = () => (
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename='/besoya_store'>
+    <HashRouter>
       <RootLayout />
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )
