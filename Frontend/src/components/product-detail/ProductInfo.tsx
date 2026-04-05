@@ -13,7 +13,11 @@ type ProductInfoProduct = APIProduct &
 
 interface ProductInfoProps {
   product: ProductInfoProduct;
-  onAddToCart: (product: ProductInfoProduct, qty: number, price: number) => void;
+  onAddToCart: (
+    product: ProductInfoProduct,
+    qty: number,
+    price: number,
+  ) => void;
 }
 
 const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
@@ -21,18 +25,21 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
   const productName = product.product_name;
   const inStock = product.inStock;
   const productRating = product.rating ?? 0;
-  const reviewCount = product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
+  const reviewCount =
+    product.reviews ?? EXTENDED_PRODUCT_DATA[productId]?.reviews?.length ?? 0;
 
   const ext = EXTENDED_PRODUCT_DATA[productId] || EXTENDED_PRODUCT_DATA.default;
   const outOfStock = inStock === 0;
 
   const [qty, setQty] = useState(1);
   const [activeVar, setActiveVar] = useState(
-    ext.variations ? ext.variations.findIndex(v => v.price === product.price) ?? 0 : 0
+    ext.variations
+      ? (ext.variations.findIndex((v) => v.price === product.price) ?? 0)
+      : 0,
   );
 
   const currentPrice = ext.variations
-    ? ext.variations[activeVar]?.price ?? product.price
+    ? (ext.variations[activeVar]?.price ?? product.price)
     : product.price;
 
   const { cls: stockCls, text: stockText } = getStockState(inStock);
@@ -53,7 +60,9 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
       <div className="pdp-rating">
         <StarsRow rating={productRating} />
         <span className="pdp-rating__score">{productRating}</span>
-        <span className="pdp-rating__count">({reviewCount.toLocaleString()} reviews)</span>
+        <span className="pdp-rating__count">
+          ({reviewCount.toLocaleString()} reviews)
+        </span>
         <span className="pdp-rating__divider">|</span>
         <span className="pdp-rating__sold">{ext.soldCount} sold</span>
       </div>
@@ -64,14 +73,17 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         <div className="pdp-price-row">
           <span className="pdp-price">{fmtPrice(currentPrice)}</span>
           {product.originalPrice && (
-            <span className="pdp-price-orig">{fmtPrice(product.originalPrice)}</span>
+            <span className="pdp-price-orig">
+              {fmtPrice(product.originalPrice)}
+            </span>
           )}
           {product.discount && (
             <span className="pdp-discount-pill">{product.discount}% off</span>
           )}
         </div>
         <div className="pdp-price-note">
-          <strong>Free delivery</strong> on orders above ₹5,000 · Inclusive of all taxes
+          <strong>Free delivery</strong> on orders above ₹5,000 · Inclusive of
+          all taxes
         </div>
       </div>
 
@@ -79,15 +91,25 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         <div className="pdp-offers__title">Available Offers</div>
         <div className="pdp-offer-row">
           <span className="pdp-offer-row__icon">🏦</span>
-          <span><strong>Bank Offer:</strong> 10% instant discount on SBI Credit Cards. Min ₹1,500 txn.</span>
+          <span>
+            <strong>Bank Offer:</strong> 10% instant discount on SBI Credit
+            Cards. Min ₹1,500 txn.
+          </span>
         </div>
         <div className="pdp-offer-row">
           <span className="pdp-offer-row__icon">🔁</span>
-          <span><strong>No Cost EMI</strong> available from ₹{Math.round(currentPrice / 12).toLocaleString("en-IN")}/month on 12-month plans.</span>
+          <span>
+            <strong>No Cost EMI</strong> available from ₹
+            {Math.round(currentPrice / 12).toLocaleString("en-IN")}/month on
+            12-month plans.
+          </span>
         </div>
         <div className="pdp-offer-row">
           <span className="pdp-offer-row__icon">🛡️</span>
-          <span><strong>Protection Plan:</strong> Add 2-year extended warranty for ₹499.</span>
+          <span>
+            <strong>Protection Plan:</strong> Add 2-year extended warranty for
+            ₹499.
+          </span>
         </div>
       </div>
 
@@ -116,19 +138,25 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
 
       {!outOfStock && (
         <div className="pdp-qty-row">
-          <div className="pdp-section-label" style={{ margin: 0 }}>Qty:</div>
+          <div className="pdp-section-label" style={{ margin: 0 }}>
+            Qty:
+          </div>
           <div className="pdp-qty-stepper">
             <button
               className="pdp-qty-btn"
-              onClick={() => setQty(q => Math.max(1, q - 1))}
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
               disabled={qty <= 1}
-            >−</button>
+            >
+              −
+            </button>
             <div className="pdp-qty-val">{qty}</div>
             <button
               className="pdp-qty-btn"
-              onClick={() => setQty(q => Math.min(inStock, q + 1))}
+              onClick={() => setQty((q) => Math.min(inStock, q + 1))}
               disabled={qty >= inStock}
-            >+</button>
+            >
+              +
+            </button>
           </div>
           <span className="pdp-qty-label">Max {inStock} units per order</span>
         </div>
@@ -144,7 +172,7 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
             <button className="pdp-btn pdp-btn--cart" onClick={handleAddToCart}>
               🛒 Add to Cart
             </button>
-            <button className="pdp-btn pdp-btn--buy">
+            <button className="pdp-btn pdp-btn--buy" onClick={handleAddToCart}>
               ⚡ Buy Now
             </button>
           </>
@@ -156,21 +184,27 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
           <span className="pdp-delivery__icon">📦</span>
           <div>
             <span className="pdp-delivery__label">Standard Delivery</span>
-            <span className="pdp-delivery__sub">Estimated 3–5 business days · Free above ₹5,000</span>
+            <span className="pdp-delivery__sub">
+              Estimated 3–5 business days · Free above ₹5,000
+            </span>
           </div>
         </div>
         <div className="pdp-delivery__row">
           <span className="pdp-delivery__icon">⚡</span>
           <div>
             <span className="pdp-delivery__label">Express Delivery</span>
-            <span className="pdp-delivery__sub">Next-day delivery available in select cities — ₹99 extra</span>
+            <span className="pdp-delivery__sub">
+              Next-day delivery available in select cities — ₹99 extra
+            </span>
           </div>
         </div>
         <div className="pdp-delivery__row">
           <span className="pdp-delivery__icon">🔄</span>
           <div>
             <span className="pdp-delivery__label">30-Day Easy Returns</span>
-            <span className="pdp-delivery__sub">No questions asked returns within 30 days of delivery</span>
+            <span className="pdp-delivery__sub">
+              No questions asked returns within 30 days of delivery
+            </span>
           </div>
         </div>
       </div>

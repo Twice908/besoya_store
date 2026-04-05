@@ -51,7 +51,7 @@ const CheckoutPage = () => {
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + getPrice(item.product) * item.qty,
-    0
+    0,
   );
   const delivery = subtotal >= 5000 ? 0 : 99;
   const total = subtotal + delivery;
@@ -108,7 +108,9 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div style={{ padding: "36px 24px 48px", maxWidth: 1200, margin: "0 auto" }}>
+    <div
+      style={{ padding: "36px 24px 48px", maxWidth: 1200, margin: "0 auto" }}
+    >
       {/* Success Modal */}
       {showSuccess && (
         <div
@@ -135,19 +137,44 @@ const CheckoutPage = () => {
             }}
           >
             <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Order Confirmed!</h3>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>
+              Order Confirmed!
+            </h3>
             <p style={{ color: "var(--muted)", marginBottom: 12 }}>
-              Your order has been placed successfully. You'll be redirected to your orders shortly.
+              Your order has been placed successfully. You'll be redirected to
+              your orders shortly.
             </p>
           </div>
         </div>
       )}
 
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          background: "transparent",
+          border: "1px solid var(--border)",
+          borderRadius: 8,
+          padding: "10px 14px",
+          color: "var(--text)",
+          cursor: "pointer",
+          marginBottom: 20,
+        }}
+      >
+        ← Back
+      </button>
+
       <div className="section-head" style={{ marginBottom: 28 }}>
         <h2 className="section-head__title">Checkout</h2>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 28 }}>
+      <div
+        className="checkout-layout"
+        style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 28 }}
+      >
         {/* Left side - Order Details */}
         <div>
           {/* Products */}
@@ -160,7 +187,9 @@ const CheckoutPage = () => {
               marginBottom: 24,
             }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Order Items</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
+              Order Items
+            </h3>
             {cartItems.map((item, idx) => (
               <div
                 key={idx}
@@ -168,7 +197,10 @@ const CheckoutPage = () => {
                   display: "flex",
                   gap: 12,
                   paddingBottom: 16,
-                  borderBottom: idx < cartItems.length - 1 ? "1px solid var(--border)" : "none",
+                  borderBottom:
+                    idx < cartItems.length - 1
+                      ? "1px solid var(--border)"
+                      : "none",
                   marginBottom: idx < cartItems.length - 1 ? 16 : 0,
                 }}
               >
@@ -191,11 +223,20 @@ const CheckoutPage = () => {
                   <div style={{ fontWeight: 600, marginBottom: 4 }}>
                     {getProductName(item.product)}
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 6 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "var(--muted)",
+                      marginBottom: 6,
+                    }}
+                  >
                     Qty: {item.qty}
                   </div>
                   <div style={{ fontWeight: 600 }}>
-                    ₹{(getPrice(item.product) * item.qty).toLocaleString("en-IN")}
+                    ₹
+                    {(getPrice(item.product) * item.qty).toLocaleString(
+                      "en-IN",
+                    )}
                   </div>
                 </div>
               </div>
@@ -212,20 +253,28 @@ const CheckoutPage = () => {
               marginBottom: 24,
             }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Delivery Address</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>
+              Delivery Address
+            </h3>
             {user ? (
-              <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}>
+              <div
+                style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}
+              >
                 <div style={{ fontWeight: 600, marginBottom: 4 }}>
                   {user.first_name} {user.last_name}
                 </div>
                 <div style={{ color: "var(--muted)" }}>{user.email}</div>
                 <div style={{ color: "var(--muted)" }}>{user.mobile}</div>
-                <div style={{ marginTop: 8, color: "var(--muted)", fontSize: 12 }}>
+                <div
+                  style={{ marginTop: 8, color: "var(--muted)", fontSize: 12 }}
+                >
                   ⓘ Address details will be confirmed during delivery
                 </div>
               </div>
             ) : (
-              <div style={{ color: "var(--muted)" }}>No address information available</div>
+              <div style={{ color: "var(--muted)" }}>
+                No address information available
+              </div>
             )}
           </div>
 
@@ -238,7 +287,9 @@ const CheckoutPage = () => {
               padding: "20px",
             }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Payment Method</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>
+              Payment Method
+            </h3>
             <div
               style={{
                 display: "flex",
@@ -260,7 +311,9 @@ const CheckoutPage = () => {
               />
               <label htmlFor="cod" style={{ flex: 1, cursor: "pointer" }}>
                 <div style={{ fontWeight: 600 }}>Cash on Delivery (COD)</div>
-                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>
+                <div
+                  style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}
+                >
                   Pay when you receive your order
                 </div>
               </label>
@@ -271,6 +324,7 @@ const CheckoutPage = () => {
         {/* Right side - Summary */}
         <div>
           <div
+            className="checkout-summary"
             style={{
               background: "white",
               border: "1px solid var(--border)",
@@ -280,14 +334,28 @@ const CheckoutPage = () => {
               top: 100,
             }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Order Summary</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
+              Order Summary
+            </h3>
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 12,
+              }}
+            >
               <span style={{ color: "var(--muted)" }}>Subtotal</span>
               <span>₹{subtotal.toLocaleString("en-IN")}</span>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 12,
+              }}
+            >
               <span style={{ color: "var(--muted)" }}>Delivery</span>
               <span>
                 {delivery === 0 ? (
@@ -299,7 +367,13 @@ const CheckoutPage = () => {
             </div>
 
             {delivery === 0 && subtotal > 0 && (
-              <div style={{ fontSize: 11.5, color: "var(--success)", marginBottom: 12 }}>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: "var(--success)",
+                  marginBottom: 12,
+                }}
+              >
                 ✓ Free delivery on orders above ₹5,000
               </div>
             )}

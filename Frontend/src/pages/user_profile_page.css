@@ -15,6 +15,24 @@
   margin-bottom: 20px;
 }
 
+.profile-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.profile-back-btn:hover {
+  background: #f4f4f4;
+}
+
 .profile-details {
   display: flex;
   flex-direction: column;

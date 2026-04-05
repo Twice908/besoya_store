@@ -11,6 +11,8 @@ import DashboardPage from "./pages/dashboard_page";
 import AddProductPage from "./pages/add_product_page";
 import EditProductPage from "./pages/edit_product_page";
 import UserProfilePage from "./pages/user_profile_page";
+import TermsPage from "./pages/terms_page";
+import ReturnsPage from "./pages/returns_page";
 import SellerAuthPage from "./pages/seller_auth_page";
 import SellerProfilePage from "./pages/seller_profile_page";
 
@@ -117,6 +119,22 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <UserProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <ProtectedRoute>
+            <TermsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/returns"
+        element={
+          <ProtectedRoute>
+            <ReturnsPage />
           </ProtectedRoute>
         }
       />

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   UserService,
@@ -8,6 +9,7 @@ import {
 import "./user_profile_page.css";
 
 const UserProfilePage = () => {
+  const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,6 +114,9 @@ const UserProfilePage = () => {
 
   return (
     <div className="user-profile-page">
+      <button className="profile-back-btn" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
       <h1>User Profile</h1>
       {!editing ? (
         <div className="profile-details">
@@ -218,7 +223,7 @@ const UserProfilePage = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Address Type:</label>
             <select
               name="address_type"
@@ -230,8 +235,8 @@ const UserProfilePage = () => {
               <option value="work">Work</option>
               <option value="other">Other</option>
             </select>
-          </div>
-          <div className="form-group">
+          </div> */}
+          {/* <div className="form-group">
             <label>Delivery Preference:</label>
             <select
               name="delivery_pref"
@@ -243,7 +248,7 @@ const UserProfilePage = () => {
               <option value="express">Express</option>
               <option value="pickup">Pickup</option>
             </select>
-          </div>
+          </div> */}
           <div className="form-actions">
             <button onClick={handleSave} disabled={saving} className="save-btn">
               {saving ? "Saving..." : "Save"}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { AuthService } from "../../services/authService";
-import { IconSearch, IconCart, IconOrders } from "./HomeIcons";
+import { IconCart, IconOrders } from "./HomeIcons";
 
 interface HomeNavbarProps {
   cartCount: number;
@@ -15,7 +15,6 @@ const HomeNavbar = ({
   onCartClick,
   onOrdersClick,
 }: HomeNavbarProps) => {
-  const [query, setQuery] = useState("");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -48,20 +47,6 @@ const HomeNavbar = ({
           Beso<span>ya</span>
         </span>
       </a>
-
-      <div className="nav-search">
-        <span className="nav-search__icon">
-          <IconSearch />
-        </span>
-        <input
-          className="nav-search__input"
-          type="text"
-          placeholder="Search for products, brands and more…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button className="nav-search__btn">Search</button>
-      </div>
 
       <div className="nav-actions">
         <button className="nav-btn" onClick={onOrdersClick} title="Orders">

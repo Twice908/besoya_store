@@ -5,6 +5,7 @@ export { default as ProductCard } from "./ProductCard";
 export { default as HomeFooter } from "./HomeFooter";
 export { default as CartSidebar } from "./CartSidebar";
 export { default as CartToast } from "./CartToast";
+export { IconSearch } from "./HomeIcons";
 
 export * from "./HomeData";
 export * from "./HomeHelpers";
