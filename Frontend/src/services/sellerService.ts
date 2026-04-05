@@ -1,6 +1,6 @@
-import { AuthService } from './authService';
+import { AuthService } from "./authService";
 
-const API_BASE_URL = 'https://besoya-store-api.onrender.com';
+const API_BASE_URL = "https://besoya-store-api.onrender.com";
 
 export interface Seller {
   seller_id: number;
@@ -34,7 +34,7 @@ export interface SellerAuthResponse {
 export interface SellerSessionData {
   token: string;
   expiresAt: number;
-  seller: SellerAuthResponse['seller'];
+  seller: SellerAuthResponse["seller"];
 }
 
 export interface UpdateSellerData {
@@ -45,7 +45,7 @@ export interface UpdateSellerData {
 }
 
 export class SellerService {
-  private static readonly SELLER_AUTH_KEY = 'sellerAuth';
+  private static readonly SELLER_AUTH_KEY = "sellerAuth";
   /** Matches backend JWT expiry (1h) */
   private static readonly SELLER_SESSION_MS = 60 * 60 * 1000;
 
@@ -74,7 +74,7 @@ export class SellerService {
     }
   }
 
-  static getSellerSessionSeller(): SellerAuthResponse['seller'] | null {
+  static getSellerSessionSeller(): SellerAuthResponse["seller"] | null {
     const raw = localStorage.getItem(this.SELLER_AUTH_KEY);
     if (!raw) return null;
     try {
@@ -97,6 +97,36 @@ export class SellerService {
     localStorage.removeItem(this.SELLER_AUTH_KEY);
   }
 
+  /** Logout seller via API */
+  static async logoutAPI(): Promise<void> {
+    try {
+      const token = this.getSellerToken();
+      if (!token) {
+        this.clearSellerAuth();
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/sellers/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Clear token regardless of API response
+      this.clearSellerAuth();
+
+      if (!response.ok) {
+        console.error("Seller logout API error:", response.status);
+      }
+    } catch (error) {
+      console.error("Seller logout error:", error);
+      // Still clear token on error
+      this.clearSellerAuth();
+    }
+  }
+
   /** Prefer seller JWT for seller API calls */
   static getSellerAuthHeaders(): Record<string, string> {
     const token = this.getSellerToken();
@@ -112,21 +142,21 @@ export class SellerService {
   static async signup(data: SellerSignupData): Promise<SellerAuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Seller signup failed');
+        throw new Error(errorData.error || "Seller signup failed");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Seller signup error:', error);
+      console.error("Seller signup error:", error);
       throw error;
     }
   }
@@ -134,7 +164,7 @@ export class SellerService {
   static async login(data: SellerLoginData): Promise<SellerAuthResponse> {
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       const existingToken = AuthService.getToken();
@@ -143,19 +173,19 @@ export class SellerService {
       }
 
       const response = await fetch(`${API_BASE_URL}/api/sellers/login`, {
-        method: 'POST',
+        method: "POST",
         headers,
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Seller login failed');
+        throw new Error(errorData.error || "Seller login failed");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Seller login error:', error);
+      console.error("Seller login error:", error);
       throw error;
     }
   }
@@ -163,20 +193,20 @@ export class SellerService {
   static async getAllSellers(): Promise<Seller[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...this.requestAuthHeaders(),
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch sellers');
+        throw new Error("Failed to fetch sellers");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Fetch sellers error:', error);
+      console.error("Fetch sellers error:", error);
       throw error;
     }
   }
@@ -184,9 +214,9 @@ export class SellerService {
   static async getSeller(sellerID: number): Promise<Seller> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers/${sellerID}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...this.requestAuthHeaders(),
         },
       });
@@ -194,13 +224,13 @@ export class SellerService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          (errorData as { error?: string }).error || 'Failed to fetch seller',
+          (errorData as { error?: string }).error || "Failed to fetch seller",
         );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Fetch seller error:', error);
+      console.error("Fetch seller error:", error);
       throw error;
     }
   }
@@ -211,9 +241,9 @@ export class SellerService {
   ): Promise<Seller> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers/${sellerID}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...this.requestAuthHeaders(),
         },
         body: JSON.stringify(data),
@@ -221,12 +251,12 @@ export class SellerService {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update seller');
+        throw new Error(errorData.error || "Failed to update seller");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Update seller error:', error);
+      console.error("Update seller error:", error);
       throw error;
     }
   }
@@ -234,19 +264,19 @@ export class SellerService {
   static async deleteSeller(sellerID: number): Promise<void> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sellers/${sellerID}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...this.requestAuthHeaders(),
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete seller');
+        throw new Error(errorData.error || "Failed to delete seller");
       }
     } catch (error) {
-      console.error('Delete seller error:', error);
+      console.error("Delete seller error:", error);
       throw error;
     }
   }

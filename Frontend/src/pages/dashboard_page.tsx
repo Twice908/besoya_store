@@ -18,9 +18,14 @@ const DashboardPage = () => {
   const sessionSeller = SellerService.getSellerSessionSeller();
   const sellerId = state?.sellerId ?? sessionSeller?.seller_id ?? null;
 
-  const handleLogout = () => {
-    SellerService.clearSellerAuth();
+  const handleLogout = async () => {
+    // Call logout API
+    await SellerService.logoutAPI();
+
+    // Clear local auth state
     logout();
+
+    // Redirect to seller login
     navigate("/seller/login", { replace: true });
   };
 
