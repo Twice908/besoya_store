@@ -1,17 +1,18 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute';
-import LoginPage from './pages/login_page';
-import SignUpPage from './pages/sign_up_page';
-import ForgotPasswordPage from './pages/forgot_password_page';
-import HomeScreenPage from './pages/home_screen';
-import ProductDetailsPage from './pages/product_details_page';
-import OrdersPage from './pages/orders_page';
-import CheckoutPage from './pages/checkout_page';
-import DashboardPage from './pages/dashboard_page';
-import AddProductPage from './pages/add_product_page';
-import EditProductPage from './pages/edit_product_page';
-import UserProfilePage from './pages/user_profile_page';
-import SellerAuthPage from './pages/seller_auth_page';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import LoginPage from "./pages/login_page";
+import SignUpPage from "./pages/sign_up_page";
+import ForgotPasswordPage from "./pages/forgot_password_page";
+import HomeScreenPage from "./pages/home_screen";
+import ProductDetailsPage from "./pages/product_details_page";
+import OrdersPage from "./pages/orders_page";
+import CheckoutPage from "./pages/checkout_page";
+import DashboardPage from "./pages/dashboard_page";
+import AddProductPage from "./pages/add_product_page";
+import EditProductPage from "./pages/edit_product_page";
+import UserProfilePage from "./pages/user_profile_page";
+import SellerAuthPage from "./pages/seller_auth_page";
+import SellerProfilePage from "./pages/seller_profile_page";
 
 export const AppRoutes = () => {
   return (
@@ -100,6 +101,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <EditProductPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/profile/:sellerId"
+        element={
+          <ProtectedRoute>
+            <SellerProfilePage />
           </ProtectedRoute>
         }
       />
