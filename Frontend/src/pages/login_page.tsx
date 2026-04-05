@@ -44,7 +44,7 @@ const LoginPage = () => {
       // If credentials are invalid, force client-side hash redirect to signup
       if (errorMsg.toLowerCase().includes("invalid credentials")) {
         const basePath = `${window.location.origin}${window.location.pathname}`;
-        window.location.replace(`${basePath}#/signup`);
+        window.location.replace(`${basePath}#/login`);
         setLoading(false);
         return;
       }
