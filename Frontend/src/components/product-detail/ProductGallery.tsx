@@ -10,18 +10,18 @@ const ProductGallery = ({ product }: ProductGalleryProps) => {
   const getEmoji = () => {
     if (product.category) {
       const categoryEmojis: Record<string, string> = {
-        'electronics': '📱',
-        'clothing': '👕',
-        'books': '📚',
-        'home': '🏠',
-        'sports': '⚽',
-        'beauty': '💄',
-        'toys': '🧸',
-        'food': '🍎'
+        electronics: "📱",
+        clothing: "👕",
+        books: "📚",
+        home: "🏠",
+        sports: "⚽",
+        beauty: "💄",
+        toys: "🧸",
+        food: "🍎",
       };
-      return categoryEmojis[product.category.toLowerCase()] || '📦';
+      return categoryEmojis[product.category.toLowerCase()] || "📦";
     }
-    return '📦'; // Default emoji
+    return "📦"; // Default emoji
   };
 
   const emoji = getEmoji();
@@ -37,17 +37,11 @@ const ProductGallery = ({ product }: ProductGalleryProps) => {
             src={product.product_image}
             alt={product.product_name}
             className="pdp-main-img__content"
-            onError={(e) => {
-              // Fallback to emoji if image fails to load
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.nextElementSibling!.textContent = emoji;
-            }}
           />
         ) : null}
-        <div className="pdp-main-img__fallback">{thumbEmojis[activeThumb]}</div>
         <button
           className={`pdp-wish-btn ${wished ? "pdp-wish-btn--active" : ""}`}
-          onClick={() => setWished(w => !w)}
+          onClick={() => setWished((w) => !w)}
         >
           {wished ? "❤️" : "🤍"}
         </button>
