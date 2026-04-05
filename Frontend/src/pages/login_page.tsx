@@ -41,16 +41,13 @@ const LoginPage = () => {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Login failed";
 
-      // If credentials are invalid, show alert and error message
+      // If credentials are invalid, redirect to signup page
       if (errorMsg.toLowerCase().includes("invalid credentials")) {
-        alert("❌ No Account Found!\n\n👉 Click 'Create one' to sign up");
-        setError("Account not found. Please create a new account.");
-        setLoading(false);
+        navigate("/signup", { replace: true });
         return;
       }
 
       setError(errorMsg);
-    } finally {
       setLoading(false);
     }
   };
