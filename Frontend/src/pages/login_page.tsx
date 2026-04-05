@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Brand from "../components/brand.tsx";
@@ -14,14 +14,24 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Get the redirect path from location state (where user was trying to go)
   const from = (location.state as any)?.from?.pathname || "/home";
 
+  // Auto-dismiss snackbar after 5 seconds
+  useEffect(() => {
+    if (snackbar) {
+      const timer = setTimeout(() => setSnackbar(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [snackbar]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setSnackbar(null);
     setLoading(true);
 
     try {
@@ -29,7 +39,17 @@ const LoginPage = () => {
       // Redirect to the page user was trying to access, or home
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const errorMsg = err instanceof Error ? err.message : "Login failed";
+
+      // If credentials are invalid, show alert and error message
+      if (errorMsg.toLowerCase().includes("invalid credentials")) {
+        alert("❌ No Account Found!\n\n👉 Click 'Create one' to sign up");
+        setError("Account not found. Please create a new account.");
+        setLoading(false);
+        return;
+      }
+
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -128,6 +148,30 @@ const LoginPage = () => {
           </button>
         </div>
       </div>
+
+      {/* Snackbar */}
+      {snackbar && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#0f7938",
+            color: "#fff",
+            padding: "14px 20px",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: 500,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            zIndex: 9999,
+            maxWidth: "90%",
+            animation: "slideUp 0.3s ease-out",
+          }}
+        >
+          {snackbar}
+        </div>
+      )}
     </div>
   );
 };
