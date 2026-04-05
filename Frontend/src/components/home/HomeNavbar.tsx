@@ -2,18 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { AuthService } from "../../services/authService";
-import { IconSearch, IconWishlist, IconCart, IconOrders } from "./HomeIcons";
+import { IconSearch, IconCart, IconOrders } from "./HomeIcons";
 
 interface HomeNavbarProps {
   cartCount: number;
-  wishCount: number;
   onCartClick: () => void;
   onOrdersClick: () => void;
 }
 
 const HomeNavbar = ({
   cartCount,
-  wishCount,
   onCartClick,
   onOrdersClick,
 }: HomeNavbarProps) => {
@@ -71,14 +69,6 @@ const HomeNavbar = ({
             <IconOrders />
           </span>
           <span className="nav-btn__label">Orders</span>
-        </button>
-
-        <button className="nav-btn" title="Wishlist">
-          <span className="nav-btn__icon">
-            <IconWishlist />
-            {wishCount > 0 && <span className="nav-badge">{wishCount}</span>}
-          </span>
-          <span className="nav-btn__label">Wishlist</span>
         </button>
 
         <button className="nav-btn" onClick={onCartClick} title="Cart">

@@ -5,7 +5,7 @@ import {
   ProductGallery,
   ProductInfo,
   ProductTabs,
-  RelatedProducts
+  RelatedProducts,
 } from "../components/product-detail";
 import { ProductService } from "../services/productService";
 import type { Product } from "../services/productService";
@@ -14,7 +14,7 @@ const ProductDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
-  
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,8 @@ const ProductDetailsPage = () => {
         setError(null);
 
         // First check if product was passed via location.state
-        let productData = (location.state as { product: Product } | null)?.product;
+        let productData = (location.state as { product: Product } | null)
+          ?.product;
 
         if (!productData && id) {
           // Fetch product from API if not passed via state
@@ -71,9 +72,18 @@ const ProductDetailsPage = () => {
     return (
       <div style={{ padding: 20, textAlign: "center" }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>❌</div>
-        <div style={{ fontSize: 15, marginBottom: 12 }}>{error || "Product not found"}</div>
+        <div style={{ fontSize: 15, marginBottom: 12 }}>
+          {error || "Product not found"}
+        </div>
         <button
-          style={{ background: "var(--accent)", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}
+          style={{
+            background: "var(--accent)",
+            color: "white",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
           onClick={() => navigate("/home")}
         >
           Back to Home
@@ -84,11 +94,7 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="pdp">
-      <ProductDetailNavbar
-        onBack={() => navigate("/home")}
-        productName={product.product_name}
-        category={product.category}
-      />
+      <ProductDetailNavbar onBack={() => navigate("/home")} />
 
       <div className="pdp-body">
         <ProductGallery product={product} />

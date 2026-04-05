@@ -864,6 +864,44 @@ const GlobalStyles = () => (
     .nav-profile__avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
     .nav-profile__name { font-size: 13px; font-weight: 500; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+    /* Mobile navbar adjustments */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 16px;
+        gap: 12px;
+      }
+      .nav-logo__name {
+        font-size: 18px;
+      }
+      .nav-search {
+        max-width: none;
+        flex: 1;
+      }
+      .nav-actions {
+        gap: 4px;
+        margin-left: 8px;
+      }
+      .nav-btn {
+        padding: 6px 8px;
+      }
+      .nav-btn__label {
+        font-size: 9px;
+      }
+      .nav-profile {
+        padding: 6px 8px;
+        gap: 6px;
+      }
+      .nav-profile__avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+      }
+      .nav-profile__name {
+        font-size: 12px;
+        max-width: 60px;
+      }
+    }
+
     .cat-bar {
       position: sticky;
       top: var(--nav-h);
@@ -949,14 +987,18 @@ const GlobalStyles = () => (
     .p-card__stock { font-size: 11.5px; color: var(--warn); font-weight: 500; }
     .p-card__stock--good { color: var(--success); }
     .p-card__stock--out { color: var(--danger); }
-    .p-card__footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
-    .p-card__btn { flex: 1; padding: 9px 0; border-radius: 8px; font-size: 12.5px; font-weight: 600; border: none; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .p-card__footer,
+    .p-card__actions { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+    .p-card__btn { flex: 1; min-width: 120px; padding: 9px 0; border-radius: 8px; font-size: 12.5px; font-weight: 600; border: none; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .p-card__btn--cart { background: var(--accent); color: #fff; }
     .p-card__btn--cart:hover { background: #2a2a2a; }
     .p-card__btn--cart:active { transform: scale(.97); }
     .p-card__btn--view { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
     .p-card__btn--view:hover { border-color: var(--accent2); }
     .p-card__btn--disabled { background: var(--surface); color: var(--muted2); cursor: not-allowed; }
+    .p-card { cursor: pointer; }
+    .p-card__btn { cursor: pointer; }
+    .p-card__btn:disabled { cursor: not-allowed; }
 
     .cart-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--accent); color: #fff; padding: 12px 22px; border-radius: 40px; font-size: 13.5px; font-weight: 500; box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 999; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: transform .3s cubic-bezier(.22,.68,0,1.2), opacity .3s; opacity: 0; pointer-events: none; }
     .cart-toast--visible { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -1214,6 +1256,48 @@ const GlobalStyles = () => (
     }
     .pdp-thumb:hover { opacity: 1; border-color: var(--border2); }
     .pdp-thumb--active { border-color: var(--accent); opacity: 1; background: var(--card); }
+
+    @media (max-width: 768px) {
+      .pdp-nav {
+        padding: 0 18px;
+      }
+      .pdp-body {
+        padding: 24px 18px 42px;
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .pdp-gallery {
+        position: static;
+        top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .pdp-main-img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: 320px;
+      }
+      .pdp-main-img__content,
+      .pdp-main-img__fallback {
+        height: 100%;
+      }
+      .pdp-thumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .pdp-thumb {
+        flex: 1 1 calc(50% - 10px);
+        min-width: calc(50% - 10px);
+        height: 82px;
+      }
+      .pdp-wish-btn {
+        top: 14px;
+        right: 14px;
+      }
+    }
 
     /* ============================================================
        RIGHT — Product info
