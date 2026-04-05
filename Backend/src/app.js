@@ -574,6 +574,54 @@ app.get(
     }
   },
 );
+// ── UPDATE order status by seller ────────────────────────────
+app.put(
+  "/api/orders/:order_id/update-status",
+  authenticateToken,
+  async (req, res) => {
+    const { order_id } = req.params;
+    const { payment_status, order_status } = req.body;
+
+    // Check if seller is authenticated
+    if (!req.user.seller_id) {
+      return res.status(403).json({ error: "Only sellers can update order status" });
+    }
+
+    // Validate payment_status
+    const validPaymentStatuses = ['Pending', 'Paid', 'Failed'];
+    if (!validPaymentStatuses.includes(payment_status)) {
+      return res.status(400).json({ error: "Invalid payment_status" });
+    }
+
+    // Validate order_status
+    const validOrderStatuses = ['Started', 'In Transit', 'Left Transit', 'Delivered', 'Returning', 'Returned', 'Cancelled'];
+    if (!validOrderStatuses.includes(order_status)) {
+      return res.status(400).json({ error: "Invalid order_status" });
+    }
+
+    try {
+      // Check if order exists and belongs to the seller
+      const orderCheck = await pool.query(
+        "SELECT * FROM orders WHERE order_id = $1 AND seller_id = $2",
+        [order_id, req.user.seller_id],
+      );
+      if (orderCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Order not found or not owned by seller" });
+      }
+
+      // Update the order
+      const result = await pool.query(
+        "UPDATE orders SET payment_status = $1, order_status = $2, updated_at = NOW() WHERE order_id = $3 RETURNING *",
+        [payment_status, order_status, order_id],
+      );
+
+      res.status(200).json(result.rows[0]);
+    } catch (err) {
+      console.error("❌ Error updating order status:", err.message);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
 // ── DELETE user ─────────────────────────────────────────────
 app.delete("/api/users/:user_id", authenticateToken, async (req, res) => {
   const { user_id } = req.params;
