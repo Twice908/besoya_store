@@ -41,9 +41,11 @@ const LoginPage = () => {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Login failed";
 
-      // If credentials are invalid, redirect to signup page
+      // If credentials are invalid, force client-side hash redirect to signup
       if (errorMsg.toLowerCase().includes("invalid credentials")) {
-        navigate("/signup", { replace: true });
+        const basePath = `${window.location.origin}${window.location.pathname}`;
+        window.location.replace(`${basePath}#/signup`);
+        setLoading(false);
         return;
       }
 
