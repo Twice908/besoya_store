@@ -199,8 +199,6 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
             </thead>
             <tbody>
               {filteredOrders.map((order) => {
-                const orderStatusInfo = orderStatusTag(order.order_status);
-                const payStatusInfo = payStatusTag(order.payment_status);
                 return (
                   <tr key={order.order_id}>
                     <td>
