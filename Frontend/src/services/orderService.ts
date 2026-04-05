@@ -75,23 +75,91 @@ export class OrderService {
       : AuthService.getAuthHeaders();
   }
 
+  private static async handleResponse<T>(
+    response: Response,
+    operationName: string,
+  ): Promise<T> {
+    // Log response details for debugging
+    console.log(
+      `[${operationName}] Response status: ${response.status} ${response.statusText}`,
+    );
+    console.log(
+      `[${operationName}] Response headers:`,
+      Object.fromEntries(response.headers.entries()),
+    );
+
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type") || "";
+
+      // Check if response is JSON
+      if (contentType.includes("application/json")) {
+        try {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error ||
+              `${operationName} failed: ${response.statusText}`,
+          );
+        } catch (e) {
+          if (e instanceof Error && !e.message.includes("failed")) {
+            throw e;
+          }
+          throw new Error(
+            `${operationName} failed: ${response.statusText} (${response.status})`,
+          );
+        }
+      } else {
+        // Response is not JSON (likely HTML error page)
+        const text = await response.text();
+        console.error(
+          `[${operationName}] Non-JSON response:`,
+          text.substring(0, 200),
+        );
+
+        // Check auth status
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            `Authentication failed (${response.status}). Please log in again.`,
+          );
+        }
+
+        throw new Error(
+          `${operationName} failed: ${response.statusText} (${response.status}). Server returned ${contentType || "unknown"} content.`,
+        );
+      }
+    }
+
+    // Successfully got a response
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      throw new Error(
+        `${operationName} returned invalid content type: ${contentType}`,
+      );
+    }
+  }
+
   static async createOrder(data: CreateOrderData): Promise<Order> {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      console.log("[createOrder] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
+      });
+
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...this.requestAuthHeaders(),
-        },
+        headers,
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create order");
-      }
-
-      return await response.json();
+      return await this.handleResponse<Order>(response, "createOrder");
     } catch (error) {
       console.error("Create order error:", error);
       throw error;
@@ -100,19 +168,24 @@ export class OrderService {
 
   static async getAllOrders(): Promise<Order[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/orders`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...this.requestAuthHeaders(),
-        },
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      console.log("[getAllOrders] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
-      }
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        method: "GET",
+        headers,
+      });
 
-      return await response.json();
+      return await this.handleResponse<Order[]>(response, "getAllOrders");
     } catch (error) {
       console.error("Fetch all orders error:", error);
       throw error;
@@ -121,22 +194,30 @@ export class OrderService {
 
   static async getOrdersByUserID(userID: number): Promise<Order[]> {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      console.log("[getOrdersByUserID] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
+      });
+
       const response = await fetch(
         `${API_BASE_URL}/api/orders/user/${userID}`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...this.requestAuthHeaders(),
-          },
+          headers,
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch user orders");
-      }
-
-      return await response.json();
+      return await this.handleResponse<Order[]>(
+        response,
+        `getOrdersByUserID(${userID})`,
+      );
     } catch (error) {
       console.error("Fetch user orders error:", error);
       throw error;
@@ -145,22 +226,30 @@ export class OrderService {
 
   static async getOrdersBySellerID(sellerID: number): Promise<Order[]> {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      console.log("[getOrdersBySellerID] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
+      });
+
       const response = await fetch(
         `${API_BASE_URL}/api/orders/seller/${sellerID}`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...this.requestAuthHeaders(),
-          },
+          headers,
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch seller orders");
-      }
-
-      return await response.json();
+      return await this.handleResponse<Order[]>(
+        response,
+        `getOrdersBySellerID(${sellerID})`,
+      );
     } catch (error) {
       console.error("Fetch seller orders error:", error);
       throw error;
@@ -172,21 +261,28 @@ export class OrderService {
     data: UpdateOrderData,
   ): Promise<Order> {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      console.log("[updateOrder] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
+      });
+
       const response = await fetch(`${API_BASE_URL}/api/orders/${orderID}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...this.requestAuthHeaders(),
-        },
+        headers,
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update order");
-      }
-
-      return await response.json();
+      return await this.handleResponse<Order>(
+        response,
+        `updateOrder(${orderID})`,
+      );
     } catch (error) {
       console.error("Update order error:", error);
       throw error;
@@ -206,24 +302,36 @@ export class OrderService {
       | "Cancelled",
   ): Promise<Order> {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...this.requestAuthHeaders(),
+      };
+
+      // Log the request for debugging
+      console.log("[updateOrderStatus] Request headers:", {
+        "Content-Type": headers["Content-Type"],
+        Authorization: headers["Authorization"]
+          ? headers["Authorization"].substring(0, 20) + "..."
+          : "NO AUTH HEADER",
+      });
+      console.log("[updateOrderStatus] Request body:", {
+        payment_status,
+        order_status,
+      });
+
       const response = await fetch(
         `${API_BASE_URL}/api/orders/${orderID}/update-status`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            ...this.requestAuthHeaders(),
-          },
+          headers,
           body: JSON.stringify({ payment_status, order_status }),
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update order status");
-      }
-
-      return await response.json();
+      return await this.handleResponse<Order>(
+        response,
+        `updateOrderStatus(${orderID})`,
+      );
     } catch (error) {
       console.error("Update order status error:", error);
       throw error;

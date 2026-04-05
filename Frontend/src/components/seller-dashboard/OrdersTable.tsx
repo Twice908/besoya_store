@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OrderService, type Order } from "../../services/orderService";
-import {
-  orderStatusTag,
-  payStatusTag,
-} from "../../utils/seller-dashboard-helpers";
+// import {
+//   orderStatusTag,
+//   payStatusTag,
+// } from "../../utils/seller-dashboard-helpers";
 
 export interface OrdersTableProps {
   sellerId: number | null;
@@ -199,8 +199,6 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
             </thead>
             <tbody>
               {filteredOrders.map((order) => {
-                const orderStatusInfo = orderStatusTag(order.order_status);
-                const payStatusInfo = payStatusTag(order.payment_status);
                 return (
                   <tr key={order.order_id}>
                     <td>
