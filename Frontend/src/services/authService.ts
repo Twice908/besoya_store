@@ -78,7 +78,7 @@ export class AuthService {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        throw new Error(errorData.error || errorData.message || "Login failed");
       }
 
       const authData = await response.json();
@@ -86,6 +86,31 @@ export class AuthService {
       return authData;
     } catch (error) {
       console.error("Login error:", error);
+      throw error;
+    }
+  }
+
+  static async checkUserExists(email: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/check?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to verify user");
+      }
+
+      const data = await response.json();
+      return data.exists === true;
+    } catch (error) {
+      console.error("Check user exists error:", error);
       throw error;
     }
   }

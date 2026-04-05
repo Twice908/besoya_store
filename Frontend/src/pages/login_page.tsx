@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { AuthService } from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
 import Brand from "../components/brand.tsx";
 import PasswordField from "../components/password_field.tsx";
@@ -35,21 +36,20 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      const emailExists = await AuthService.checkUserExists(email);
+      if (!emailExists) {
+        const basePath = `${window.location.origin}${window.location.pathname}`;
+        window.location.replace(`${basePath}#/signup`);
+        return;
+      }
+
       await login(email, password);
       // Redirect to the page user was trying to access, or home
       navigate(from, { replace: true });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Login failed";
-
-      // If credentials are invalid, force client-side hash redirect to signup
-      if (errorMsg.toLowerCase().includes("invalid credentials")) {
-        const basePath = `${window.location.origin}${window.location.pathname}`;
-        window.location.replace(`${basePath}#/login`);
-        setLoading(false);
-        return;
-      }
-
       setError(errorMsg);
+    } finally {
       setLoading(false);
     }
   };

@@ -140,6 +140,26 @@ app.post("/api/users", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Check if a user exists by email
+app.get("/api/users/check", async (req, res) => {
+  const email = String(req.query.email || "").trim();
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT 1 FROM users WHERE email = $1 LIMIT 1",
+      [email],
+    );
+    res.json({ exists: result.rows.length > 0 });
+  } catch (err) {
+    console.error("❌ Error checking user email:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // ------ Add all sellers
 // Signup API for sellers
 app.post("/api/sellers", async (req, res) => {
