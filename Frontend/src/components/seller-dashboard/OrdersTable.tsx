@@ -1,15 +1,31 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { OrderService, type Order } from "../../services/orderService";
 import {
-  OrderService,
-  type Order,
-} from "../../services/orderService";
-import { orderStatusTag, payStatusTag } from "../../utils/seller-dashboard-helpers";
+  orderStatusTag,
+  payStatusTag,
+} from "../../utils/seller-dashboard-helpers";
 
 export interface OrdersTableProps {
   sellerId: number | null;
 }
 
 const ORDER_STATUS_FILTERS: Order["order_status"][] = [
+  "Started",
+  "In Transit",
+  "Left Transit",
+  "Delivered",
+  "Returning",
+  "Returned",
+  "Cancelled",
+];
+
+const PAYMENT_STATUSES: Order["payment_status"][] = [
+  "Pending",
+  "Paid",
+  "Failed",
+];
+
+const ORDER_STATUSES: Order["order_status"][] = [
   "Started",
   "In Transit",
   "Left Transit",
@@ -47,6 +63,49 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
     }
   }, [sellerId]);
 
+  const handleStatusUpdate = useCallback(
+    async (
+      orderId: number,
+      newPaymentStatus: Order["payment_status"],
+      newOrderStatus: Order["order_status"],
+    ) => {
+      const order = orders.find((o) => o.order_id === orderId);
+      if (!order) return;
+
+      const changes = [];
+      if (order.payment_status !== newPaymentStatus) {
+        changes.push(
+          `Payment Status: ${order.payment_status} → ${newPaymentStatus}`,
+        );
+      }
+      if (order.order_status !== newOrderStatus) {
+        changes.push(`Order Status: ${order.order_status} → ${newOrderStatus}`);
+      }
+
+      if (changes.length === 0) return; // No changes
+
+      const confirmed = window.confirm(
+        `Confirm status update for Order ${order.order_number}?\n\n${changes.join("\n")}`,
+      );
+
+      if (!confirmed) return;
+
+      try {
+        const updatedOrder = await OrderService.updateOrderStatus(
+          orderId,
+          newPaymentStatus,
+          newOrderStatus,
+        );
+        setOrders((prev) =>
+          prev.map((o) => (o.order_id === orderId ? updatedOrder : o)),
+        );
+      } catch (e) {
+        alert(e instanceof Error ? e.message : "Failed to update order status");
+      }
+    },
+    [orders],
+  );
+
   useEffect(() => {
     void loadOrders();
   }, [loadOrders]);
@@ -73,7 +132,9 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
   if (sellerId == null) {
     return (
       <div className="empty-state">
-        <div className="empty-state__text">Seller ID is missing. Sign in again.</div>
+        <div className="empty-state__text">
+          Seller ID is missing. Sign in again.
+        </div>
       </div>
     );
   }
@@ -116,9 +177,7 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
           </div>
         ) : null}
 
-        {loading ? (
-          <p>Loading orders…</p>
-        ) : null}
+        {loading ? <p>Loading orders…</p> : null}
 
         {filteredOrders.length > 0 ? (
           <table className="tbl">
@@ -158,14 +217,58 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
                     <td>{formatMoney(order.unit_price)}</td>
                     <td>{formatMoney(order.total_price)}</td>
                     <td>
-                      <div className={`tag ${payStatusInfo.color}`}>
-                        {payStatusInfo.text}
-                      </div>
+                      <select
+                        value={order.payment_status}
+                        onChange={(e) =>
+                          handleStatusUpdate(
+                            order.order_id,
+                            e.target.value as Order["payment_status"],
+                            order.order_status,
+                          )
+                        }
+                        style={{
+                          background: "var(--surface)",
+                          border: "1px solid var(--border)",
+                          borderRadius: "6px",
+                          padding: "4px 8px",
+                          fontSize: "12px",
+                          color: "var(--text)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {PAYMENT_STATUSES.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td>
-                      <span className={`tag ${orderStatusInfo.color}`}>
-                        {orderStatusInfo.text}
-                      </span>
+                      <select
+                        value={order.order_status}
+                        onChange={(e) =>
+                          handleStatusUpdate(
+                            order.order_id,
+                            order.payment_status,
+                            e.target.value as Order["order_status"],
+                          )
+                        }
+                        style={{
+                          background: "var(--surface)",
+                          border: "1px solid var(--border)",
+                          borderRadius: "6px",
+                          padding: "4px 8px",
+                          fontSize: "12px",
+                          color: "var(--text)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {ORDER_STATUSES.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td style={{ fontSize: 12 }}>
                       {order.order_date
