@@ -43,11 +43,6 @@ const CheckoutPage = () => {
     );
   };
 
-  // Helper to get fallback emoji
-  const getEmoji = (product: any): string => {
-    return product.emoji || "📦";
-  };
-
   // Helper to get product name
   const getProductName = (product: any): string => {
     return product.product_name || product.name || "Product";
