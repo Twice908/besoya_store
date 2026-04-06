@@ -7,7 +7,7 @@ export const CATEGORIES = [
   { id: "kids", label: "Kids", emoji: "🧸" },
   { id: "Wellness", label: "Wellness", emoji: "🧴" },
   { id: "Decor", label: "Decor", emoji: "🪔" },
-  { id: "kitchen", label: "Kitchen", emoji: "🍳" },
+  { id: "Kitchen", label: "Kitchen", emoji: "🍳" },
   { id: "Gadgets", label: "Gadgets", emoji: "🔌" },
   { id: "Auto", label: "Auto", emoji: "🚗" },
   { id: "Accessories", label: "Accessories", emoji: "👜" },
