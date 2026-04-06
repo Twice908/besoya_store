@@ -6,25 +6,24 @@ interface ProductGalleryProps {
 }
 
 const ProductGallery = ({ product }: ProductGalleryProps) => {
-  // Provide fallback emoji based on category or use a default
-  const getEmoji = () => {
-    if (product.category) {
-      const categoryEmojis: Record<string, string> = {
-        electronics: "📱",
-        clothing: "👕",
-        books: "📚",
-        home: "🏠",
-        sports: "⚽",
-        beauty: "💄",
-        toys: "🧸",
-        food: "🍎",
-      };
-      return categoryEmojis[product.category.toLowerCase()] || "📦";
-    }
-    return "📦"; // Default emoji
-  };
-
-  const emoji = getEmoji();
+  // Provide fallback emoji logic kept for future thumbnail restore.
+  // const getEmoji = () => {
+  //   if (product.category) {
+  //     const categoryEmojis: Record<string, string> = {
+  //       electronics: "📱",
+  //       clothing: "👕",
+  //       books: "📚",
+  //       home: "🏠",
+  //       sports: "⚽",
+  //       beauty: "💄",
+  //       toys: "🧸",
+  //       food: "🍎",
+  //     };
+  //     return categoryEmojis[product.category.toLowerCase()] || "📦";
+  //   }
+  //   return "📦"; // Default emoji
+  // };
+  // const emoji = getEmoji();
   // const thumbEmojis = [emoji, emoji, emoji, emoji];
   // const [activeThumb, setActiveThumb] = useState(0);
   const [wished, setWished] = useState(false);
