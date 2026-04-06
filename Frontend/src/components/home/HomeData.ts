@@ -2,17 +2,17 @@ export type { Product } from "../../services/productService";
 
 export const CATEGORIES = [
   { id: "all", label: "All", emoji: "🛍️" },
-  { id: "womens_fashion", label: "Women", emoji: "👗" },
-  { id: "mens_fashion", label: "Men", emoji: "👔" },
+  { id: "Women", label: "Women", emoji: "👗" },
+  { id: "Men", label: "Men", emoji: "👔" },
   { id: "kids", label: "Kids", emoji: "🧸" },
-  { id: "personal_care_wellness", label: "Wellness", emoji: "🧴" },
-  { id: "home_decor", label: "Decor", emoji: "🪔" },
-  { id: "kitchen_essentials", label: "Kitchen", emoji: "🍳" },
-  { id: "electric_gadgets", label: "Gadgets", emoji: "🔌" },
-  { id: "car_accessories", label: "Auto", emoji: "🚗" },
-  { id: "fashion_accessories", label: "Accessories", emoji: "👜" },
-  { id: "gifts_novelty", label: "Gifts", emoji: "🎁" },
-  { id: "footwear_beauty", label: "Footwear", emoji: "👠" },
+  { id: "Wellness", label: "Wellness", emoji: "🧴" },
+  { id: "Decor", label: "Decor", emoji: "🪔" },
+  { id: "kitchen", label: "Kitchen", emoji: "🍳" },
+  { id: "Gadgets", label: "Gadgets", emoji: "🔌" },
+  { id: "Auto", label: "Auto", emoji: "🚗" },
+  { id: "Accessories", label: "Accessories", emoji: "👜" },
+  { id: "Gifts", label: "Gifts", emoji: "🎁" },
+  { id: "Footwear", label: "Footwear", emoji: "👠" },
 ];
 
 export const SORT_OPTIONS = [
