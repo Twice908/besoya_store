@@ -11,6 +11,11 @@ type ProductInfoProduct = APIProduct &
     reviews: number;
   }>;
 
+type ProductVariant = {
+  label: string;
+  price: number;
+};
+
 interface ProductInfoProps {
   product: ProductInfoProduct;
   onAddToCart: (
@@ -30,17 +35,32 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
 
   const ext = EXTENDED_PRODUCT_DATA[productId] || EXTENDED_PRODUCT_DATA.default;
   const outOfStock = inStock === 0;
+  const variants: ProductVariant[] = Array.isArray(product.variations)
+    ? product.variations.filter(
+        (variant): variant is ProductVariant =>
+          typeof variant === "object" &&
+          variant !== null &&
+          typeof (variant as { label?: unknown }).label === "string" &&
+          typeof (variant as { price?: unknown }).price === "number",
+      )
+    : [];
 
   const [qty, setQty] = useState(1);
   const [activeVar, setActiveVar] = useState(
-    ext.variations
-      ? (ext.variations.findIndex((v) => v.price === product.price) ?? 0)
+    variants.length > 0
+      ? Math.max(
+          0,
+          variants.findIndex((v) => v.price === product.price),
+        )
       : 0,
   );
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
-  const currentPrice = ext.variations
-    ? (ext.variations[activeVar]?.price ?? product.price)
+  const currentPrice = variants.length > 0
+    ? (variants[activeVar]?.price ?? product.price)
     : product.price;
+  const productDescription = product.description?.trim() || "No description available.";
+  const hasLongDescription = productDescription.length > 140;
 
   const { cls: stockCls, text: stockText } = getStockState(inStock);
 
@@ -67,6 +87,42 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         <span className="pdp-rating__sold">{ext.soldCount} sold</span>
       </div>
 
+      <div style={{ marginTop: 14 }}>
+        <div className="pdp-section-label" style={{ marginBottom: 8 }}>
+          Description
+        </div>
+        <p
+          style={{
+            margin: 0,
+            color: "var(--muted)",
+            lineHeight: 1.6,
+            display: showFullDescription ? "block" : "-webkit-box",
+            WebkitLineClamp: showFullDescription ? "unset" : 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {productDescription}
+        </p>
+        {hasLongDescription && (
+          <button
+            type="button"
+            onClick={() => setShowFullDescription((v) => !v)}
+            style={{
+              marginTop: 8,
+              border: "none",
+              background: "transparent",
+              color: "var(--accent)",
+              padding: 0,
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            {showFullDescription ? "Read Less" : "Read More"}
+          </button>
+        )}
+      </div>
+
       <div className="pdp-divider" />
 
       <div className="pdp-price-block">
@@ -82,12 +138,11 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
           )}
         </div>
         <div className="pdp-price-note">
-          <strong>Free delivery</strong> on orders above ₹5,000 · Inclusive of
-          all taxes
+          <strong>Free delivery</strong> on all orders · Inclusive of all taxes
         </div>
       </div>
 
-      <div className="pdp-offers">
+      {/* <div className="pdp-offers">
         <div className="pdp-offers__title">Available Offers</div>
         <div className="pdp-offer-row">
           <span className="pdp-offer-row__icon">🏦</span>
@@ -111,13 +166,13 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
             ₹499.
           </span>
         </div>
-      </div>
+      </div> */}
 
-      {ext.variations && (
+      {variants.length > 0 ? (
         <div style={{ marginBottom: 20 }}>
           <div className="pdp-section-label">Select Variant</div>
           <div className="pdp-variations">
-            {ext.variations.map((v, i) => (
+            {variants.map((v, i) => (
               <button
                 key={i}
                 className={`pdp-var-btn ${activeVar === i ? "pdp-var-btn--active" : ""}`}
@@ -128,6 +183,10 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
               </button>
             ))}
           </div>
+        </div>
+      ) : (
+        <div style={{ marginBottom: 20 }}>
+          <div className="pdp-section-label">No Variants Available</div>
         </div>
       )}
 
@@ -179,13 +238,13 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         )}
       </div>
 
-      <div className="pdp-delivery">
+      {/* <div className="pdp-delivery">
         <div className="pdp-delivery__row">
           <span className="pdp-delivery__icon">📦</span>
           <div>
             <span className="pdp-delivery__label">Standard Delivery</span>
             <span className="pdp-delivery__sub">
-              Estimated 3–5 business days · Free above ₹5,000
+              Estimated 5-8 business days · Free on all orders
             </span>
           </div>
         </div>
@@ -207,7 +266,7 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

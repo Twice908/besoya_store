@@ -105,153 +105,156 @@ const UserProfilePage = () => {
   };
 
   if (loading) {
-    return <div className="user-profile-page">Loading...</div>;
+    return (
+      <div className="user-profile-page">
+        <div className="profile-header">
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{ fontSize: '18px', color: '#718096' }}>Loading profile...</div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
-    return <div className="user-profile-page">User not found</div>;
+    return (
+      <div className="user-profile-page">
+        <div className="profile-header">
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{ fontSize: '18px', color: '#e53e3e' }}>User not found</div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="user-profile-page">
-      <button className="profile-back-btn" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
-      <h1>User Profile</h1>
+      <div className="profile-header">
+        <button className="profile-back-btn" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
+        <h1>User Profile</h1>
+        <p className="profile-subtitle">Manage your personal information and preferences</p>
+      </div>
+      
       {!editing ? (
         <div className="profile-details">
           <div className="detail-item">
-            <label>Email:</label>
+            <label>Email</label>
             <span>{user.email}</span>
           </div>
           <div className="detail-item">
-            <label>Mobile Number:</label>
+            <label>Mobile Number</label>
             <span>{user.mobile}</span>
           </div>
           <div className="detail-item">
-            <label>Address:</label>
+            <label>Address</label>
             <span>{formatAddress(user)}</span>
           </div>
           <div className="detail-item">
-            <label>Delivery Preference:</label>
+            <label>Delivery Preference</label>
             <span>{user.delivery_pref || "Not specified"}</span>
           </div>
           <button onClick={handleEdit} className="edit-btn">
-            Edit
+            Edit Profile
           </button>
         </div>
       ) : (
         <div className="profile-edit">
           <div className="form-group">
-            <label>First Name:</label>
+            <label>First Name</label>
             <input
               type="text"
               name="first_name"
               value={formData.first_name || ""}
               onChange={handleInputChange}
+              placeholder="Enter your first name"
             />
           </div>
           <div className="form-group">
-            <label>Last Name:</label>
+            <label>Last Name</label>
             <input
               type="text"
               name="last_name"
               value={formData.last_name || ""}
               onChange={handleInputChange}
+              placeholder="Enter your last name"
             />
           </div>
           <div className="form-group">
-            <label>Email:</label>
+            <label>Email</label>
             <input
               type="email"
               name="email"
               value={formData.email || ""}
               onChange={handleInputChange}
+              placeholder="Enter your email address"
             />
           </div>
           <div className="form-group">
-            <label>Mobile Number:</label>
+            <label>Mobile Number</label>
             <input
               type="text"
               name="mobile"
               value={formData.mobile || ""}
               onChange={handleInputChange}
+              placeholder="Enter your mobile number"
             />
           </div>
           <div className="form-group">
-            <label>Address Line:</label>
+            <label>Address Line</label>
             <input
               type="text"
               name="address_line"
               value={formData.address_line || ""}
               onChange={handleInputChange}
+              placeholder="Enter your street address"
             />
           </div>
           <div className="form-group">
-            <label>Area:</label>
+            <label>Area</label>
             <input
               type="text"
               name="area"
               value={formData.area || ""}
               onChange={handleInputChange}
+              placeholder="Enter your area/neighborhood"
             />
           </div>
           <div className="form-group">
-            <label>Landmark:</label>
+            <label>Landmark</label>
             <input
               type="text"
               name="landmark"
               value={formData.landmark || ""}
               onChange={handleInputChange}
+              placeholder="Enter a nearby landmark"
             />
           </div>
           <div className="form-group">
-            <label>City:</label>
+            <label>City</label>
             <input
               type="text"
               name="city"
               value={formData.city || ""}
               onChange={handleInputChange}
+              placeholder="Enter your city"
             />
           </div>
           <div className="form-group">
-            <label>Postal Code:</label>
+            <label>Postal Code</label>
             <input
               type="text"
               name="postal_code"
               value={formData.postal_code || ""}
               onChange={handleInputChange}
+              placeholder="Enter your postal code"
             />
           </div>
-          {/* <div className="form-group">
-            <label>Address Type:</label>
-            <select
-              name="address_type"
-              value={formData.address_type || ""}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="home">Home</option>
-              <option value="work">Work</option>
-              <option value="other">Other</option>
-            </select>
-          </div> */}
-          {/* <div className="form-group">
-            <label>Delivery Preference:</label>
-            <select
-              name="delivery_pref"
-              value={formData.delivery_pref || ""}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              <option value="standard">Standard</option>
-              <option value="express">Express</option>
-              <option value="pickup">Pickup</option>
-            </select>
-          </div> */}
           <div className="form-actions">
             <button onClick={handleSave} disabled={saving} className="save-btn">
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save Changes"}
             </button>
             <button onClick={handleCancel} className="cancel-btn">
               Cancel

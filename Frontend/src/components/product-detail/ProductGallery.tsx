@@ -25,8 +25,8 @@ const ProductGallery = ({ product }: ProductGalleryProps) => {
   };
 
   const emoji = getEmoji();
-  const thumbEmojis = [emoji, emoji, emoji, emoji];
-  const [activeThumb, setActiveThumb] = useState(0);
+  // const thumbEmojis = [emoji, emoji, emoji, emoji];
+  // const [activeThumb, setActiveThumb] = useState(0);
   const [wished, setWished] = useState(false);
 
   return (
@@ -47,7 +47,7 @@ const ProductGallery = ({ product }: ProductGalleryProps) => {
         </button>
       </div>
 
-      <div className="pdp-thumbs">
+      {/* <div className="pdp-thumbs">
         {thumbEmojis.map((e, i) => (
           <div
             key={i}
@@ -57,7 +57,7 @@ const ProductGallery = ({ product }: ProductGalleryProps) => {
             {e}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

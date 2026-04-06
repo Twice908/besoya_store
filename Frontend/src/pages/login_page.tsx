@@ -33,13 +33,18 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
     setSnackbar(null);
+
+    if (!email.trim()) {
+      setError("Please enter your email before signing in.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const emailExists = await AuthService.checkUserExists(email);
       if (!emailExists) {
-        const basePath = `${window.location.origin}${window.location.pathname}`;
-        window.location.replace(`${basePath}#/signup`);
+        navigate("/signup", { state: { email }, replace: true });
         return;
       }
 
