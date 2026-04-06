@@ -42,9 +42,13 @@ const HomeNavbar = ({
   return (
     <nav className="navbar">
       <a className="nav-logo" href="#">
-        <div className="nav-logo__icon">🛍</div>
+        <img 
+          src="/logoBesoya_store.jpeg" 
+          alt="Besoya Store" 
+          className="nav-logo__image"
+        />
         <span className="nav-logo__name">
-          Beso<span>ya</span>
+          Beso<span>ya</span><span> Store</span>
         </span>
       </a>
 
@@ -76,9 +80,9 @@ const HomeNavbar = ({
             <div className="nav-profile__avatar">
               {user ? getInitials(user.first_name, user.last_name) : "U"}
             </div>
-            <span className="nav-profile__name">
+            {/* <span className="nav-profile__name">
               {user ? `${user.first_name} ${user.last_name}` : "User"}
-            </span>
+            </span> */}
           </button>
 
           {showProfileMenu && (

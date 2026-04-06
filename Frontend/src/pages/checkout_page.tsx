@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuthService } from "../services/authService";
+import { useAuth } from "../contexts/AuthContext";
 import { OrderService } from "../services/orderService";
 
 interface CartItem {
@@ -13,9 +13,9 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   const cartItems: CartItem[] = location.state?.cartItems || [];
-  const user = AuthService.getCurrentUser();
 
   // Helper to get product ID
   const getProductId = (product: any): number => {
@@ -32,7 +32,18 @@ const CheckoutPage = () => {
     return product.price || 0;
   };
 
-  // Helper to get product emoji
+  // Helper to get product image URL
+  const getProductImageUrl = (product: any): string | null => {
+    return (
+      product.product_image ||
+      product.image ||
+      product.image_url ||
+      product.thumbnail ||
+      null
+    );
+  };
+
+  // Helper to get fallback emoji
   const getEmoji = (product: any): string => {
     return product.emoji || "📦";
   };
@@ -49,16 +60,24 @@ const CheckoutPage = () => {
     }
   }, [cartItems, navigate]);
 
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate("/login", { state: { from: location }, replace: true });
+    }
+  }, [isLoading, isAuthenticated, navigate, location]);
+
   const subtotal = cartItems.reduce(
     (sum, item) => sum + getPrice(item.product) * item.qty,
     0,
   );
-  const delivery = subtotal >= 5000 ? 0 : 99;
+  // const delivery = subtotal >= 5000 ? 0 : 99;
+  const originalDelivery = 99;
+  const delivery = 0;
   const total = subtotal + delivery;
 
   const handleConfirmOrder = async () => {
-    if (!user) {
-      alert("Please sign in to place an order");
+    if (!user || !isAuthenticated) {
+      navigate("/login", { state: { from: location }, replace: true });
       return;
     }
 
@@ -190,57 +209,81 @@ const CheckoutPage = () => {
             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
               Order Items
             </h3>
-            {cartItems.map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  paddingBottom: 16,
-                  borderBottom:
-                    idx < cartItems.length - 1
-                      ? "1px solid var(--border)"
-                      : "none",
-                  marginBottom: idx < cartItems.length - 1 ? 16 : 0,
-                }}
-              >
+            {cartItems.map((item, idx) => {
+              const imageUrl = getProductImageUrl(item.product);
+              return (
                 <div
+                  key={idx}
                   style={{
-                    width: 60,
-                    height: 60,
-                    background: "var(--surface)",
-                    borderRadius: "8px",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 24,
-                    flexShrink: 0,
+                    gap: 12,
+                    paddingBottom: 16,
+                    borderBottom:
+                      idx < cartItems.length - 1
+                        ? "1px solid var(--border)"
+                        : "none",
+                    marginBottom: idx < cartItems.length - 1 ? 16 : 0,
                   }}
                 >
-                  {getEmoji(item.product)}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    {getProductName(item.product)}
-                  </div>
                   <div
                     style={{
-                      fontSize: 13,
-                      color: "var(--muted)",
-                      marginBottom: 6,
+                      width: 60,
+                      height: 60,
+                      background: "var(--surface)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                      border: "1px solid var(--border)",
                     }}
                   >
-                    Qty: {item.qty}
-                  </div>
-                  <div style={{ fontWeight: 600 }}>
-                    ₹
-                    {(getPrice(item.product) * item.qty).toLocaleString(
-                      "en-IN",
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={getProductName(item.product)}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                          objectPosition: "center",
+                        }}
+                      />
+                    ) : (
+                      <span
+                        style={{
+                          color: "var(--muted)",
+                          fontSize: 18,
+                        }}
+                      >
+                        🖼️
+                      </span>
                     )}
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                      {getProductName(item.product)}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: "var(--muted)",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Qty: {item.qty}
+                    </div>
+                    <div style={{ fontWeight: 600 }}>
+                      ₹
+                      {(getPrice(item.product) * item.qty).toLocaleString(
+                        "en-IN",
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Delivery Address */}
@@ -271,11 +314,7 @@ const CheckoutPage = () => {
                   ⓘ Address details will be confirmed during delivery
                 </div>
               </div>
-            ) : (
-              <div style={{ color: "var(--muted)" }}>
-                No address information available
-              </div>
-            )}
+            ) : null}
           </div>
 
           {/* Payment Method */}
@@ -357,16 +396,21 @@ const CheckoutPage = () => {
               }}
             >
               <span style={{ color: "var(--muted)" }}>Delivery</span>
-              <span>
-                {delivery === 0 ? (
-                  <span style={{ color: "var(--success)" }}>FREE 🎉</span>
-                ) : (
-                  `₹${delivery.toLocaleString("en-IN")}`
-                )}
+              <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                <span
+                  style={{
+                    color: "var(--muted)",
+                    textDecoration: "line-through",
+                    opacity: 0.75,
+                  }}
+                >
+                  ₹{originalDelivery.toLocaleString("en-IN")}
+                </span>
+                <span style={{ color: "var(--success)", fontWeight: 600 }}>FREE</span>
               </span>
             </div>
 
-            {delivery === 0 && subtotal > 0 && (
+            {subtotal > 0 && (
               <div
                 style={{
                   fontSize: 11.5,
@@ -374,7 +418,7 @@ const CheckoutPage = () => {
                   marginBottom: 12,
                 }}
               >
-                ✓ Free delivery on orders above ₹5,000
+                ✓ Delivery charges waived (₹99 - ₹0)
               </div>
             )}
 

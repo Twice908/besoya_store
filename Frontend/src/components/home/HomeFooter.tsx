@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const HomeFooter = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userEmail = user?.email?.trim() || "Not available";
 
   const openWhatsApp = (message: string) => {
     const encoded = encodeURIComponent(message);
-    const url = `https://api.whatsapp.com/send?phone=917218719013&text=${encoded}`;
+    const url = `https://api.whatsapp.com/send?phone=9193159 07006&text=${encoded}`;
     window.open(url, "_blank");
   };
 
@@ -32,13 +35,19 @@ const HomeFooter = () => {
       links: [
         {
           label: "Help Centre",
-          action: () => openWhatsApp("Hello Besoya Store support"),
+          action: () =>
+            openWhatsApp(
+              `Hello Besoya Store Support Team, I need assistance with my order. Please help.\n\nCustomer Email: ${userEmail}`,
+            ),
         },
         { label: "Terms and conditions", action: () => navigate("/terms") },
         { label: "Returns & Refunds", action: () => navigate("/returns") },
         {
           label: "Contact Us",
-          action: () => openWhatsApp("Hello Besoya Store support"),
+          action: () =>
+            openWhatsApp(
+              `Hello Besoya Store Support Team, I would like to get in touch regarding a query. Please assist.\n\nCustomer Email: ${userEmail}`,
+            ),
         },
       ],
     },

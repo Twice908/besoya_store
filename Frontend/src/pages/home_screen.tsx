@@ -28,6 +28,7 @@ const HomeScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const normalizedSearch = searchQuery.trim().toLowerCase();
 
   // Fetch products on component mount
   useEffect(() => {
@@ -52,6 +53,10 @@ const HomeScreen = () => {
 
   const visible = products
     .filter((p) => activeCategory === "all" || p.category === activeCategory)
+    .filter((p) => {
+      if (!normalizedSearch) return true;
+      return p.product_name.toLowerCase().includes(normalizedSearch);
+    })
     .filter((p) => {
       if (activeFilters.includes("Under ₹1,000") && p.price >= 1000)
         return false;
@@ -126,14 +131,17 @@ const HomeScreen = () => {
           <input
             className="nav-search__input"
             type="text"
-            placeholder="Search for products, brands and more…"
+            placeholder="Search for products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <button className="nav-search__btn">Search</button>
         </div>
       </div>
-      <CategoryBar active={activeCategory} setActive={setActiveCategory} />
+      
+      <div style={{ marginTop: '20px' }}>
+        <CategoryBar active={activeCategory} setActive={setActiveCategory} />
+      </div>
       <div className="home-shell">
         {activeCategory === "all" && <HeroBanner />}
 

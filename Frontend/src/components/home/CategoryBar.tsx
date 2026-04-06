@@ -13,8 +13,10 @@ const CategoryBar = ({ active, setActive }: CategoryBarProps) => (
         className={`cat-tab ${active === c.id ? "cat-tab--active" : ""}`}
         onClick={() => setActive(c.id)}
       >
-        <span className="cat-tab__emoji">{c.emoji}</span>
-        {c.label}
+        <div className="cat-tab__content">
+          <span className="cat-tab__emoji">{c.emoji}</span>
+          <span className="cat-tab__label">{c.label}</span>
+        </div>
       </button>
     ))}
   </div>
