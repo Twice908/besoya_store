@@ -21,7 +21,7 @@ const ReturnsPage = () => {
       <h1 style={{ fontSize: 32, marginBottom: 18 }}>Returns and Refunds</h1>
       <p style={{ color: "#444", lineHeight: 1.8, marginBottom: 12 }}>
         We are committed to your satisfaction. If you are not happy with your
-        purchase, you may request a return within 30 days of delivery.
+        purchase, you may request a return within 5 days of delivery.
       </p>
       <p style={{ color: "#444", lineHeight: 1.8, marginBottom: 12 }}>
         To be eligible for a return, the item must be unused, in the same
