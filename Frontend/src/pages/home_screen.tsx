@@ -4,7 +4,6 @@ import {
   HomeNavbar,
   CategoryBar,
   IconSearch,
-  HeroBanner,
   ProductCard,
   HomeFooter,
   CartSidebar,
@@ -150,7 +149,7 @@ const HomeScreen = () => {
         <CategoryBar active={activeCategory} setActive={setActiveCategory} />
       </div>
       <div className="home-shell">
-        {activeCategory === "all" && <HeroBanner />}
+        {/* {activeCategory === "all" && <HeroBanner />} */}
 
         <div
           className="section-head"
