@@ -6,19 +6,26 @@ import {
   type User,
   type UpdateUserData,
 } from "../services/userService";
+import { SESSION_EXPIRED_ERROR } from "../services/productService";
 import "./user_profile_page.css";
+
+/** Same UX as expired session when auth context has no user. */
+const AUTH_REQUIRED = "AUTH_REQUIRED";
 
 const UserProfilePage = () => {
   const navigate = useNavigate();
-  const { user: authUser } = useAuth();
+  const { user: authUser, isLoading: authLoading, logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<UpdateUserData>({});
   const [saving, setSaving] = useState(false);
 
   const fetchUserDetails = useCallback(async () => {
     if (!authUser) return;
+    setFetchError(null);
+    setLoading(true);
     try {
       const userData = await UserService.getUser(authUser.user_id);
       setUser(userData);
@@ -37,16 +44,40 @@ const UserProfilePage = () => {
       });
     } catch (error) {
       console.error("Failed to fetch user details:", error);
+      const msg =
+        error instanceof Error ? error.message : "Failed to load profile";
+      setFetchError(
+        msg === SESSION_EXPIRED_ERROR ? SESSION_EXPIRED_ERROR : msg,
+      );
+      setUser(null);
     } finally {
       setLoading(false);
     }
   }, [authUser]);
 
   useEffect(() => {
+    if (!authLoading && !authUser) {
+      setLoading(false);
+      setFetchError(AUTH_REQUIRED);
+    }
+  }, [authLoading, authUser]);
+
+  useEffect(() => {
     if (authUser) {
       fetchUserDetails();
     }
   }, [authUser, fetchUserDetails]);
+
+  const handleSessionExpiredSignIn = () => {
+    logout();
+    navigate("/login", {
+      replace: true,
+      state: { from: { pathname: "/profile" } },
+    });
+  };
+
+  const isSessionExpired =
+    fetchError === SESSION_EXPIRED_ERROR || fetchError === AUTH_REQUIRED;
 
   const handleEdit = () => {
     setEditing(true);
@@ -80,6 +111,12 @@ const UserProfilePage = () => {
       setEditing(false);
     } catch (error) {
       console.error("Failed to update user:", error);
+      const msg =
+        error instanceof Error ? error.message : "Failed to update profile";
+      if (msg === SESSION_EXPIRED_ERROR) {
+        setFetchError(SESSION_EXPIRED_ERROR);
+        setUser(null);
+      }
     } finally {
       setSaving(false);
     }
@@ -104,12 +141,80 @@ const UserProfilePage = () => {
     return parts.join(", ") || "Not provided";
   };
 
-  if (loading) {
+  if (loading && !fetchError) {
     return (
       <div className="user-profile-page">
         <div className="profile-header">
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <div style={{ fontSize: '18px', color: '#718096' }}>Loading profile...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isSessionExpired) {
+    return (
+      <div className="user-profile-page">
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "var(--text)",
+            maxWidth: 420,
+            margin: "0 auto",
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
+          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>
+            Session expired
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              color: "var(--muted)",
+              marginBottom: 20,
+              lineHeight: 1.5,
+            }}
+          >
+            Please sign in again to continue shopping with a fresh session.
+          </div>
+          <button
+            type="button"
+            style={{
+              background: "var(--accent)",
+              color: "white",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: 600,
+              fontSize: 14,
+            }}
+            onClick={handleSessionExpiredSignIn}
+          >
+            Sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="user-profile-page">
+        <div className="profile-header">
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <div style={{ fontSize: "18px", color: "#e53e3e", marginBottom: 16 }}>
+              {fetchError}
+            </div>
+            <button
+              type="button"
+              className="edit-btn"
+              onClick={() => void fetchUserDetails()}
+            >
+              Try again
+            </button>
           </div>
         </div>
       </div>

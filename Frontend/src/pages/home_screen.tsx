@@ -14,10 +14,12 @@ import {
   FILTER_CHIPS,
 } from "../components/home";
 import type { Product } from "../components/home";
-import { ProductService } from "../services/productService";
+import { useAuth } from "../contexts/AuthContext";
+import { ProductService, SESSION_EXPIRED_ERROR } from "../services/productService";
 
 const HomeScreen = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState("popular");
@@ -40,9 +42,9 @@ const HomeScreen = () => {
         setProducts(fetchedProducts);
       } catch (err) {
         console.error("Failed to fetch products:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to load products",
-        );
+        const message =
+          err instanceof Error ? err.message : "Failed to load products";
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -115,6 +117,11 @@ const HomeScreen = () => {
     setActiveFilters((prev) =>
       prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
     );
+
+  const handleSessionExpiredSignIn = () => {
+    logout();
+    navigate("/login", { replace: true, state: { from: { pathname: "/home" } } });
+  };
 
   return (
     <>
@@ -196,6 +203,47 @@ const HomeScreen = () => {
           >
             <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
             <div style={{ fontSize: 15 }}>Loading products...</div>
+          </div>
+        ) : error === SESSION_EXPIRED_ERROR ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              color: "var(--text)",
+              maxWidth: 420,
+              margin: "0 auto",
+            }}
+          >
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>
+              Session expired
+            </div>
+            <div
+              style={{
+                fontSize: 15,
+                color: "var(--muted)",
+                marginBottom: 20,
+                lineHeight: 1.5,
+              }}
+            >
+              Please sign in again to continue shopping with a fresh session.
+            </div>
+            <button
+              type="button"
+              style={{
+                background: "var(--accent)",
+                color: "white",
+                border: "none",
+                padding: "10px 22px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: 14,
+              }}
+              onClick={handleSessionExpiredSignIn}
+            >
+              Sign in
+            </button>
           </div>
         ) : error ? (
           <div
