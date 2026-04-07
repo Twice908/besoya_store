@@ -8,6 +8,8 @@ export interface Order {
   order_id: number;
   order_number: string;
   product_id: number;
+  /** Snapshot of product title at order time */
+  product_name?: string;
   seller_id: number;
   user_id: number;
   variation_label?: string;
@@ -30,6 +32,7 @@ export interface Order {
 
 export interface CreateOrderData {
   product_id: number;
+  product_name: string;
   seller_id: number;
   user_id: number;
   variation_label?: string;
@@ -50,6 +53,7 @@ export interface CreateOrderData {
 
 export interface UpdateOrderData {
   product_id?: number;
+  product_name?: string;
   seller_id?: number;
   user_id?: number;
   variation_label?: string;

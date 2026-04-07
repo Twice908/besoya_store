@@ -91,6 +91,7 @@ const CheckoutPage = () => {
 
         await OrderService.createOrder({
           product_id: productId,
+          product_name: getProductName(item.product),
           seller_id: sellerId,
           user_id: user.user_id,
           quantity: item.qty,

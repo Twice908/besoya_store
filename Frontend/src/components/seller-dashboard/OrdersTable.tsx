@@ -122,6 +122,7 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
           o.order_number.toLowerCase().includes(q) ||
           String(o.order_id).includes(q) ||
           String(o.product_id).includes(q) ||
+          (o.product_name || "").toLowerCase().includes(q) ||
           String(o.user_id).includes(q) ||
           o.deliver_to.toLowerCase().includes(q),
       );
@@ -148,7 +149,7 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
           <span className="search-box__icon">🔍</span>
           <input
             type="text"
-            placeholder="Search order_number, order_id, product_id, user_id, deliver_to…"
+            placeholder="Search order #, product name, product_id, user_id, address…"
             value={searchOrder}
             onChange={(e) => setSearchOrder(e.target.value)}
             disabled={loading}
@@ -186,6 +187,7 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
                 <th>order_number</th>
                 <th>order_id</th>
                 <th>product_id</th>
+                <th>product_name</th>
                 <th>user_id</th>
                 <th>variation_label</th>
                 <th>quantity</th>
@@ -206,6 +208,7 @@ export const OrdersTable = ({ sellerId }: OrdersTableProps) => {
                     </td>
                     <td>{order.order_id}</td>
                     <td>{order.product_id}</td>
+                    <td>{order.product_name?.trim() || "—"}</td>
                     <td>{order.user_id}</td>
                     <td>{order.variation_label ?? "—"}</td>
                     <td>{order.quantity}</td>

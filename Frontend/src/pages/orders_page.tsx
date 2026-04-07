@@ -159,6 +159,7 @@ const OrdersPage = () => {
             <thead>
               <tr>
                 <th>Order</th>
+                <th>Product</th>
                 <th>Date</th>
                 <th>Payment</th>
                 <th>Status</th>
@@ -172,6 +173,7 @@ const OrdersPage = () => {
                     <div className="order-num">{order.order_number}</div>
                     <div className="order-id">#{order.order_id}</div>
                   </td>
+                  <td>{order.product_name?.trim() || "—"}</td>
                   <td>{formatDate(order.order_date)}</td>
                   <td>{order.payment_status}</td>
                   <td>
