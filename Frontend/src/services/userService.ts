@@ -1,4 +1,5 @@
 import { AuthService } from './authService';
+import { SESSION_EXPIRED_ERROR } from './productService';
 
 const API_BASE_URL = 'https://besoya-store-api.onrender.com';
 
@@ -45,6 +46,9 @@ export class UserService {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
         throw new Error('Failed to fetch users');
       }
 
@@ -66,6 +70,24 @@ export class UserService {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
+        const errorData = (await response.json().catch(() => ({}))) as {
+          error?: string;
+          message?: string;
+        };
+        const msg = String(
+          errorData.error || errorData.message || '',
+        ).toLowerCase();
+        if (
+          msg.includes('token') ||
+          msg.includes('unauthorized') ||
+          msg.includes('expired') ||
+          msg.includes('invalid token')
+        ) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
         throw new Error('Failed to fetch user');
       }
 
@@ -88,7 +110,18 @@ export class UserService {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
         const errorData = await response.json();
+        const msg = String(errorData.error || '').toLowerCase();
+        if (
+          msg.includes('token') ||
+          msg.includes('unauthorized') ||
+          msg.includes('expired')
+        ) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
         throw new Error(errorData.error || 'Failed to update user');
       }
 

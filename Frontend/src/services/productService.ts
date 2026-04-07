@@ -3,6 +3,9 @@ import { SellerService } from './sellerService';
 
 const API_BASE_URL = 'https://besoya-store-api.onrender.com';
 
+/** Thrown when the API rejects the request due to auth (e.g. expired token). */
+export const SESSION_EXPIRED_ERROR = 'SESSION_EXPIRED';
+
 /** Normalized product for the app (camelCase). API uses `in_stock`. */
 export interface Product {
   product_id: number;
@@ -140,7 +143,27 @@ export class ProductService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
+        const errorData = (await response.json().catch(() => ({}))) as {
+          error?: string;
+          message?: string;
+        };
+        const msg = String(
+          errorData.error || errorData.message || '',
+        ).toLowerCase();
+        if (
+          msg.includes('token') ||
+          msg.includes('unauthorized') ||
+          msg.includes('expired') ||
+          msg.includes('invalid token')
+        ) {
+          throw new Error(SESSION_EXPIRED_ERROR);
+        }
+        throw new Error(
+          errorData.error || errorData.message || 'Failed to fetch products',
+        );
       }
 
       const rows = (await response.json()) as ApiProductRow[];
