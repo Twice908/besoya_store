@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { EXTENDED_PRODUCT_DATA } from "./ProductDetailData";
-import { fmtPrice, StarsRow, getStockState } from "./ProductDetailHelpers";
+import { fmtPrice, StarsRow } from "./ProductDetailHelpers";
 import type { Product as APIProduct } from "../../services/productService";
 
 type ProductInfoProduct = APIProduct &
@@ -62,7 +62,7 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
   const productDescription = product.description?.trim() || "No description available.";
   const hasLongDescription = productDescription.length > 140;
 
-  const { cls: stockCls, text: stockText } = getStockState(inStock);
+  // const { cls: stockCls, text: stockText } = getStockState(inStock);
 
   const handleAddToCart = () => {
     onAddToCart(product, qty, currentPrice);
