@@ -139,11 +139,11 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <div style={{ marginTop: 12 }}>
+        {/* <div style={{ marginTop: 12 }}>
           <button type="button" onClick={() => navigate("/seller/login")}>
             Login as Seller
           </button>
-        </div>
+        </div> */}
 
         <div className="form-foot" style={{ marginTop: 24 }}>
           Don't have an account?{" "}
