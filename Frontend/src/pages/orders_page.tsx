@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { OrderService } from "../services/orderService";
 import type { Order } from "../services/orderService";
 import { AuthService } from "../services/authService";
+import { SESSION_EXPIRED_ERROR } from "../services/productService";
+
+/** Local session missing (e.g. cleared token); same UX as expired session. */
+const AUTH_REQUIRED = "AUTH_REQUIRED";
 
 const OrdersPage = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +21,7 @@ const OrdersPage = () => {
       const user = AuthService.getCurrentUser();
 
       if (!user) {
-        setError("Unable to load your orders. Please sign in again.");
+        setError(AUTH_REQUIRED);
         setLoading(false);
         return;
       }
@@ -37,6 +43,17 @@ const OrdersPage = () => {
 
     fetchOrders();
   }, []);
+
+  const handleSessionExpiredSignIn = () => {
+    logout();
+    navigate("/login", {
+      replace: true,
+      state: { from: { pathname: "/orders" } },
+    });
+  };
+
+  const isSessionExpired =
+    error === SESSION_EXPIRED_ERROR || error === AUTH_REQUIRED;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -85,6 +102,47 @@ const OrdersPage = () => {
           <div className="empty-state__icon">⏳</div>
           <div className="empty-state__text">Loading your orders…</div>
         </div>
+      ) : isSessionExpired ? (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "var(--text)",
+            maxWidth: 420,
+            margin: "0 auto",
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
+          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>
+            Session expired
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              color: "var(--muted)",
+              marginBottom: 20,
+              lineHeight: 1.5,
+            }}
+          >
+            Please sign in again to continue shopping with a fresh session.
+          </div>
+          <button
+            type="button"
+            style={{
+              background: "var(--accent)",
+              color: "white",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: 600,
+              fontSize: 14,
+            }}
+            onClick={handleSessionExpiredSignIn}
+          >
+            Sign in
+          </button>
+        </div>
       ) : error ? (
         <div className="empty-state" style={{ padding: "60px 20px" }}>
           <div className="empty-state__icon">❌</div>
@@ -101,6 +159,7 @@ const OrdersPage = () => {
             <thead>
               <tr>
                 <th>Order</th>
+                <th>Product</th>
                 <th>Date</th>
                 <th>Payment</th>
                 <th>Status</th>
@@ -114,6 +173,7 @@ const OrdersPage = () => {
                     <div className="order-num">{order.order_number}</div>
                     <div className="order-id">#{order.order_id}</div>
                   </td>
+                  <td>{order.product_name?.trim() || "—"}</td>
                   <td>{formatDate(order.order_date)}</td>
                   <td>{order.payment_status}</td>
                   <td>

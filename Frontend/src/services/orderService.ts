@@ -1,5 +1,6 @@
 import { AuthService } from "./authService";
 import { SellerService } from "./sellerService";
+import { SESSION_EXPIRED_ERROR } from "./productService";
 
 const API_BASE_URL = "https://besoya-store-api.onrender.com";
 
@@ -7,6 +8,8 @@ export interface Order {
   order_id: number;
   order_number: string;
   product_id: number;
+  /** Snapshot of product title at order time */
+  product_name?: string;
   seller_id: number;
   user_id: number;
   variation_label?: string;
@@ -29,6 +32,7 @@ export interface Order {
 
 export interface CreateOrderData {
   product_id: number;
+  product_name: string;
   seller_id: number;
   user_id: number;
   variation_label?: string;
@@ -49,6 +53,7 @@ export interface CreateOrderData {
 
 export interface UpdateOrderData {
   product_id?: number;
+  product_name?: string;
   seller_id?: number;
   user_id?: number;
   variation_label?: string;
@@ -89,17 +94,35 @@ export class OrderService {
     );
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(SESSION_EXPIRED_ERROR);
+      }
+
       const contentType = response.headers.get("content-type") || "";
 
       // Check if response is JSON
       if (contentType.includes("application/json")) {
         try {
           const errorData = await response.json();
+          const msg = String(
+            errorData.error || errorData.message || "",
+          ).toLowerCase();
+          if (
+            msg.includes("token") ||
+            msg.includes("unauthorized") ||
+            msg.includes("expired") ||
+            msg.includes("invalid token")
+          ) {
+            throw new Error(SESSION_EXPIRED_ERROR);
+          }
           throw new Error(
             errorData.error ||
               `${operationName} failed: ${response.statusText}`,
           );
         } catch (e) {
+          if (e instanceof Error && e.message === SESSION_EXPIRED_ERROR) {
+            throw e;
+          }
           if (e instanceof Error && !e.message.includes("failed")) {
             throw e;
           }
@@ -114,13 +137,6 @@ export class OrderService {
           `[${operationName}] Non-JSON response:`,
           text.substring(0, 200),
         );
-
-        // Check auth status
-        if (response.status === 401 || response.status === 403) {
-          throw new Error(
-            `Authentication failed (${response.status}). Please log in again.`,
-          );
-        }
 
         throw new Error(
           `${operationName} failed: ${response.statusText} (${response.status}). Server returned ${contentType || "unknown"} content.`,

@@ -3,6 +3,9 @@ import { SellerService } from './sellerService';
 
 const API_BASE_URL = 'https://besoya-store-api.onrender.com';
 
+/** Thrown when the API rejects the request due to auth (e.g. expired token). */
+export const SESSION_EXPIRED_ERROR = 'SESSION_EXPIRED';
+
 /** Normalized product for the app (camelCase). API uses `in_stock`. */
 export interface Product {
   product_id: number;

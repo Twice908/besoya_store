@@ -81,6 +81,7 @@ console.log('✅ order_number_seq ready');
 
       product_id      INT          NOT NULL
                       REFERENCES products(product_id) ON DELETE RESTRICT,
+      product_name    VARCHAR(150) NOT NULL DEFAULT '',
       seller_id       INT          NOT NULL
                       REFERENCES sellers(seller_id)  ON DELETE RESTRICT,
       user_id         INT          NOT NULL

@@ -79,6 +79,7 @@ export const ORDERS = [
   {
     id: "ORD-20240301-001",
     product: "Split AC",
+    product_name: "Split AC",
     datetime: "Mar 01, 2024 • 9:15 AM",
     buyer: "Rajesh Kumar",
     address: "Bangalore, Karnataka",
@@ -89,6 +90,7 @@ export const ORDERS = [
   {
     id: "ORD-20240302-002",
     product: "Running Shoes",
+    product_name: "Running Shoes",
     datetime: "Mar 02, 2024 • 2:45 PM",
     buyer: "Priya Singh",
     address: "Delhi, India",
@@ -99,6 +101,7 @@ export const ORDERS = [
   {
     id: "ORD-20240303-003",
     product: "Laptop Stand",
+    product_name: "Laptop Stand",
     datetime: "Mar 03, 2024 • 11:30 AM",
     buyer: "Amit Patel",
     address: "Mumbai, Maharashtra",
@@ -109,6 +112,7 @@ export const ORDERS = [
   {
     id: "ORD-20240304-004",
     product: "Washing Machine",
+    product_name: "Washing Machine",
     datetime: "Mar 04, 2024 • 8:20 AM",
     buyer: "Sanjay Verma",
     address: "Pune, Maharashtra",
@@ -119,6 +123,7 @@ export const ORDERS = [
   {
     id: "ORD-20240305-005",
     product: "Dining Table",
+    product_name: "Dining Table",
     datetime: "Mar 05, 2024 • 4:10 PM",
     buyer: "Nisha Gupta",
     address: "Chennai, Tamil Nadu",
@@ -129,6 +134,7 @@ export const ORDERS = [
   {
     id: "ORD-20240306-006",
     product: "Bluetooth Speaker",
+    product_name: "Bluetooth Speaker",
     datetime: "Mar 06, 2024 • 10:05 AM",
     buyer: "Vikram Singh",
     address: "Hyderabad, Telangana",
@@ -139,6 +145,7 @@ export const ORDERS = [
   {
     id: "ORD-20240306-007",
     product: "Running Shoes",
+    product_name: "Running Shoes",
     datetime: "Mar 06, 2024 • 3:50 PM",
     buyer: "Simran Kapoor",
     address: "Jaipur, Rajasthan",
