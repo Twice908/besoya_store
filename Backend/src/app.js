@@ -46,7 +46,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 // Ensure preflight (OPTIONS) always gets proper CORS headers
-app.options("*", cors(corsOptions));
+// Use a regex path for compatibility across router/express versions.
+app.options(/.*/, cors(corsOptions));
 
 // const pool = new Pool({
 //   connectionString: process.env.DATABASE_URL,
