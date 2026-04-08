@@ -304,6 +304,7 @@ app.post("/api/sellers/logout", authenticateToken, async (req, res) => {
 app.post("/api/orders", authenticateToken, async (req, res) => {
   const {
     product_id,
+    product_name,
     seller_id,
     user_id,
     variation_label,
@@ -316,9 +317,10 @@ app.post("/api/orders", authenticateToken, async (req, res) => {
   } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO orders (product_id, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+      "INSERT INTO orders (product_id, prduct_name, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
       [
         product_id,
+        product_name,
         seller_id,
         user_id,
         variation_label,
