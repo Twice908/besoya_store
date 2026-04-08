@@ -50,6 +50,12 @@ app.use(cors(corsOptions));
 // Preflight handler (same policy, ensures OPTIONS gets CORS headers)
 app.options(/.*/, cors(corsOptions));
 
+// Ensure all API responses default to JSON content-type
+app.use("/api", (req, res, next) => {
+  res.type("application/json");
+  next();
+});
+
 // const pool = new Pool({
 //   connectionString: process.env.DATABASE_URL,
 //   ssl: {
