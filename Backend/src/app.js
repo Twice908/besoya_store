@@ -25,7 +25,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
@@ -44,7 +44,11 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
-}));
+};
+
+app.use(cors(corsOptions));
+// Preflight handler (same policy, ensures OPTIONS gets CORS headers)
+app.options(/.*/, cors(corsOptions));
 
 // const pool = new Pool({
 //   connectionString: process.env.DATABASE_URL,
