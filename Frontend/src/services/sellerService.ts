@@ -196,6 +196,9 @@ export class SellerService {
         `${API_BASE_URL}/api/sellers/check?email=${encodeURIComponent(email)}`,
         {
           method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
       );
 

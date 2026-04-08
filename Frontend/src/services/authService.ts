@@ -96,6 +96,9 @@ export class AuthService {
         `${API_BASE_URL}/api/users/check?email=${encodeURIComponent(email)}`,
         {
           method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
       );
 
