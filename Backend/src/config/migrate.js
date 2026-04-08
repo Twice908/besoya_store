@@ -157,7 +157,7 @@ const createTables = async () => {
       'order_id SERIAL PRIMARY KEY',
       'order_number VARCHAR(20) NOT NULL UNIQUE',
       'product_id INT NOT NULL REFERENCES products(product_id) ON DELETE RESTRICT',
-      'product_name VARCHAR(150) NOT NULL DEFAULT',
+      "product_name VARCHAR(150) NOT NULL DEFAULT ''",
       'seller_id INT NOT NULL REFERENCES sellers(seller_id) ON DELETE RESTRICT',
       'user_id INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT',
       'variation_label VARCHAR(100)',
