@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://besoya-store-api.onrender.com"; // Adjust if deployed
+const API_BASE_URL = "https://besoya-store.onrender.com"; // Adjust if deployed
 
 export interface SignupData {
   first_name: string;

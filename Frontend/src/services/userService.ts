@@ -1,7 +1,7 @@
 import { AuthService } from './authService';
 import { SESSION_EXPIRED_ERROR } from './productService';
 
-const API_BASE_URL = 'https://besoya-store-api.onrender.com';
+const API_BASE_URL = 'https://besoya-store.onrender.com';
 
 export interface User {
   user_id: number;

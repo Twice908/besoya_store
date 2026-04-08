@@ -1,7 +1,7 @@
 import { AuthService } from './authService';
 import { SellerService } from './sellerService';
 
-const API_BASE_URL = 'https://besoya-store-api.onrender.com';
+const API_BASE_URL = 'https://besoya-store.onrender.com';
 
 /** Thrown when the API rejects the request due to auth (e.g. expired token). */
 export const SESSION_EXPIRED_ERROR = 'SESSION_EXPIRED';

@@ -1,6 +1,6 @@
 import { AuthService } from "./authService";
 
-const API_BASE_URL = "https://besoya-store-api.onrender.com";
+const API_BASE_URL = "https://besoya-store.onrender.com";
 
 export interface Seller {
   seller_id: number;
