@@ -301,6 +301,44 @@ app.post("/api/sellers/logout", authenticateToken, async (req, res) => {
   }
 });
 // ------ Add all orders
+// app.post("/api/orders", authenticateToken, async (req, res) => {
+//   const {
+//     product_id,
+//     product_name,
+//     seller_id,
+//     user_id,
+//     variation_label,
+//     quantity,
+//     deliver_to,
+//     unit_price,
+//     total_price,
+//     payment_status,
+//     order_status,
+//   } = req.body;
+//   try {
+//     const result = await pool.query(
+//       "INSERT INTO orders (product_id, prduct_name, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+//       [
+//         product_id,
+//         product_name,
+//         seller_id,
+//         user_id,
+//         variation_label,
+//         quantity || 1,
+//         deliver_to,
+//         unit_price,
+//         total_price,
+//         payment_status || "Pending",
+//         order_status || "Started",
+//       ],
+//     );
+//     res.status(201).json(result.rows[0]);
+//   } catch (err) {
+//     console.error("❌ Error inserting order:", err.message);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
 app.post("/api/orders", authenticateToken, async (req, res) => {
   const {
     product_id,
@@ -317,10 +355,10 @@ app.post("/api/orders", authenticateToken, async (req, res) => {
   } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO orders (product_id, prduct_name, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+      "INSERT INTO orders (product_id, product_name, seller_id, user_id, variation_label, quantity, deliver_to, unit_price, total_price, payment_status, order_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
       [
         product_id,
-        product_name,
+        typeof product_name === "string" ? product_name.slice(0, 150) : "",
         seller_id,
         user_id,
         variation_label,
@@ -338,6 +376,7 @@ app.post("/api/orders", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 // ── GET all users ──────────────────────────────────────────
 app.get("/api/users", authenticateToken, async (req, res) => {
   try {
