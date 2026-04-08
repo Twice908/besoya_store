@@ -105,6 +105,10 @@ export class ProductService {
     return Object.keys(seller).length > 0 ? seller : AuthService.getAuthHeaders();
   }
 
+  private static publicHeaders(): Record<string, string> {
+    return { 'Content-Type': 'application/json' };
+  }
+
   static async createProduct(data: CreateProductData): Promise<Product> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
@@ -133,14 +137,17 @@ export class ProductService {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.requestAuthHeaders(),
-        },
+        // Public endpoint: don't attach auth headers (avoids "token expired" issues)
+        headers: this.publicHeaders(),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          (errorData as { error?: string; message?: string }).error ||
+            (errorData as { error?: string; message?: string }).message ||
+            'Failed to fetch products',
+        );
       }
 
       const rows = (await response.json()) as ApiProductRow[];
@@ -155,14 +162,17 @@ export class ProductService {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/${productID}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.requestAuthHeaders(),
-        },
+        // Public endpoint: don't attach auth headers (avoids "token expired" issues)
+        headers: this.publicHeaders(),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch product');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          (errorData as { error?: string; message?: string }).error ||
+            (errorData as { error?: string; message?: string }).message ||
+            'Failed to fetch product',
+        );
       }
 
       const json = (await response.json()) as ApiProductRow;

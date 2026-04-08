@@ -20,12 +20,14 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthResponse['user'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const checkAuth = () => {
     const currentUser = AuthService.getCurrentUser();
     const isAuth = AuthService.isAuthenticated();
 
     setUser(currentUser);
+    setIsAuthenticated(isAuth);
     setIsLoading(false);
 
     return isAuth;
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated,
     isLoading,
     login,
     logout,

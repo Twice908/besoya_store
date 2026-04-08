@@ -52,19 +52,11 @@ export const AppRoutes = () => {
       {/* Protected routes - require authentication */}
       <Route
         path="/home"
-        element={
-          <ProtectedRoute>
-            <HomeScreenPage />
-          </ProtectedRoute>
-        }
+        element={<HomeScreenPage />}
       />
       <Route
         path="/product/:id"
-        element={
-          <ProtectedRoute>
-            <ProductDetailsPage />
-          </ProtectedRoute>
-        }
+        element={<ProductDetailsPage />}
       />
       <Route
         path="/orders"

@@ -395,7 +395,7 @@ app.get("/api/sellers/:seller_id", authenticateToken, async (req, res) => {
   }
 });
 // ── GET all products ──────────────────────────────────────────
-app.get("/api/products", authenticateToken, async (req, res) => {
+app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM products ORDER BY created_at DESC",
@@ -566,7 +566,7 @@ app.get(
   },
 );
 // ── GET single product (after /seller/:id so "seller" is not captured as id) ──
-app.get("/api/products/:product_id", authenticateToken, async (req, res) => {
+app.get("/api/products/:product_id", async (req, res) => {
   const { product_id } = req.params;
   try {
     const result = await pool.query(
