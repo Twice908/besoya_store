@@ -109,8 +109,7 @@ export class ProductService {
   }
 
   private static publicHeaders(): Record<string, string> {
-    // Avoid forcing CORS preflight on simple GET requests.
-    return {};
+    return { 'Content-Type': 'application/json' };
   }
 
   static async createProduct(data: CreateProductData): Promise<Product> {
@@ -194,6 +193,7 @@ export class ProductService {
         {
           method: 'GET',
           headers: {
+            'Content-Type': 'application/json',
             ...this.requestAuthHeaders(),
           },
         },
