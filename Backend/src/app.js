@@ -25,26 +25,28 @@ const authenticateToken = (req, res, next) => {
 };
 
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "https://twice908.github.io",
-    ];
+    const allowedOrigins = ["http://localhost:5173", "https://twice908.github.io"];
 
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+  // JWT is passed in Authorization header; no cookies needed for auth
+  credentials: false,
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+// Ensure preflight (OPTIONS) always gets proper CORS headers
+app.options("*", cors(corsOptions));
 
 // const pool = new Pool({
 //   connectionString: process.env.DATABASE_URL,
